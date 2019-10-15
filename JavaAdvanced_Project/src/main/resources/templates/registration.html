@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+    <title>Приёмная комиссия - регистрация нового пользователя</title>
+</head>
+
+<body>
+   	<h3>Регистрация нового пользователя</h3>
+    <div th:if="${message}">
+        <p th:text="${message}" />
+    </div>
+
+    <div th:if="${param.error}">
+      	Введены некорректыне данные!
+    </div>
+    <div th:if="${param.logout}">
+        Вы только что вышли из программы!
+    </div>
+    <form th:action="@{/registration}" method="post">
+        <div><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/></div>
+        <div><label>Имя: <input type="text" name="firstName"/></label></div>
+        <div><label>Фамилия: <input type="text" name="lastName"/></label></div>
+        <div><label>Email: <input type="text" name="email"/></label></div>
+        <div><label>Пароль: <input type="password" name="password"/></label></div>
+        <div><input type="submit" value="Регистрация"/></div>
+    </form>
+</body>
+
+</html>
