@@ -41,6 +41,8 @@ public class User implements UserDetails {
 	private String password;
 	@Column
 	private boolean active;
+	@Column
+	private String activationCode;
 
 	@ElementCollection(targetClass = AccessLevel.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "access_level", joinColumns = @JoinColumn(name = "user_id"))
@@ -106,6 +108,14 @@ public class User implements UserDetails {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+	
+	public String getActivationCode() {
+		return activationCode;
+	}
+
+	public void setActivationCode(String activationCode) {
+		this.activationCode = activationCode;
 	}
 
 	public Set<AccessLevel> getAccessLevels() {

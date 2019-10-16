@@ -1,42 +1,47 @@
 package ua.lviv.lgs.admissionsOffice.controller;
 
-import java.util.Collections;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import ua.lviv.lgs.admissionsOffice.dao.UserRepository;
-import ua.lviv.lgs.admissionsOffice.domain.AccessLevel;
 import ua.lviv.lgs.admissionsOffice.domain.User;
+import ua.lviv.lgs.admissionsOffice.service.UserService;
 
 @Controller
-@RequestMapping("/registration")
 public class RegistrationController {
 	@Autowired
-	private UserRepository userRepository;
+	private UserService userService;
 
-	@GetMapping
+	@GetMapping("/registration")
 	public String viewRegistrationForm() {
 		return "registration";
 	}
 
-	@PostMapping
-	public String addUser(User user, Model model) {
-		User userFromDb = userRepository.findByEmail(user.getEmail());
-
-		if (userFromDb != null) {
+	@PostMapping("/registration")
+	public String registerUser(User user, Model model, RedirectAttributes redir) {
+		if (!userService.addUser(user)) {
 			model.addAttribute("message", "Такой пользователь уже существует!");
 			return "registration";
 		}
-
-		user.setActive(true);
-		user.setAccessLevels(Collections.singleton(AccessLevel.USER));
-		userRepository.save(user);
-
-		return "redirect:/login";
+		
+		redir.addFlashAttribute("message", "Для активации пользователя перейдите по ссылке в письме, отправленном на указанный Вами электронный ящик!");
+		return "redirect:/login/";
 	}
+	
+	@GetMapping("/activate/{code}")
+    public String activate(@PathVariable String code, Model model) {
+        boolean isActivated = userService.activateUser(code);
+
+        if (isActivated) {
+            model.addAttribute("message", "Пользователь успешно активирован!");
+        } else {
+            model.addAttribute("message", "Код активации не найден!");
+        }
+
+        return "login";
+    }
 }
