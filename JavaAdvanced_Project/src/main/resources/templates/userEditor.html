@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+    <title>Приёмная комиссия - редактор пользователя</title>
+</head>
+
+<body>
+    <h3>Редактор пользователя</h3>
+    <form action="/user" method="post">
+		<div><label>Имя: <input type="text" name="firstName" th:value="${user.firstName}"/></label></div>
+		<div><label>Фамилия: <input type="text" name="lastName" th:value="${user.lastName}"/></label></div>
+		<div><label>Email: <input type="text" name="email" th:value="${user.email}"/></label></div>
+		<div><label>Активность: <input type="checkbox" name="active" th:checked="${user.active}"/></label></div>
+
+		<div>Уровни доступа:
+			<div th:each="accessLevel: ${accessLevels}">
+				<input type="checkbox" th:name="${accessLevel}" th:value="${accessLevel}" th:checked="${user.accessLevels.contains(accessLevel)}"/>
+				<label th:text="${accessLevel}"></label>
+			</div>
+		</div>
+
+		<div><input type="hidden" name="userId" th:value="${user.id}"/></div>
+        <div><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/></div>
+                
+        <button type="submit">Сохранить</button>
+    </form>
+</body>
+
+</html>
