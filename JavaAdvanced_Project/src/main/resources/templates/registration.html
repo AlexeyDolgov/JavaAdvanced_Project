@@ -4,6 +4,7 @@
 
 <head>
     <title>Приёмная комиссия - регистрация нового пользователя</title>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
 </head>
 
 <body>
@@ -24,6 +25,12 @@
         <div><label>Фамилия: <input type="text" name="lastName"/></label></div>
         <div><label>Email: <input type="text" name="email"/></label></div>
         <div><label>Пароль: <input type="password" name="password"/></label></div>
+        <div>
+            <div class="g-recaptcha" data-sitekey="6LdnEL4UAAAAAM6h1YjSYgcOdN6BSAZBhU8pyM-m"></div>
+            <div th:if="${captchaError}">
+				<p th:text="${captchaError}" />
+			</div>            
+        </div>
         <div><input type="submit" value="Регистрация"/></div>
     </form>
 </body>
