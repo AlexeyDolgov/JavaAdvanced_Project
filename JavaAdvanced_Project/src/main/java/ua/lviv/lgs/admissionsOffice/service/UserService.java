@@ -1,7 +1,12 @@
 package ua.lviv.lgs.admissionsOffice.service;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +34,14 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email);
     }
     
+    public User findById(Integer id) {
+    	return userRepository.findById(id).get();
+    }
+    
+    public List<User> findAll() {
+    	return userRepository.findAll();
+    }
+
     public boolean addUser(User user) {
         User userFromDb = userRepository.findByEmail(user.getEmail());
 
@@ -42,8 +55,12 @@ public class UserService implements UserDetailsService {
         user.setActivationCode(UUID.randomUUID().toString());
 
         userRepository.save(user);
+        sendActivationCode(user);
+        return true;
+    }
 
-        if (!StringUtils.isEmpty(user.getEmail())) {
+	public void sendActivationCode(User user) {
+		if (!StringUtils.isEmpty(user.getEmail())) {
             String message = String.format(
             		"Доброго времени суток, %s %s! \n\n" +
             				"Добро пожаловать в приложение \"Приёмная комиссия\".\n" +
@@ -56,9 +73,7 @@ public class UserService implements UserDetailsService {
 
             mailSender.send(user.getEmail(), "Код активации аккаунта", message);
         }
-
-        return true;
-    }
+	}
 
     public boolean activateUser(String code) {
         User user = userRepository.findByActivationCode(code);
@@ -74,4 +89,55 @@ public class UserService implements UserDetailsService {
 
         return true;
     }
+
+    public void saveUser(User user, Map<String, String> form) {
+		user.setFirstName(form.get("firstName"));
+		user.setLastName(form.get("lastName"));
+		user.setEmail(form.get("email"));
+		
+		if (form.keySet().contains("active")) {
+			user.setActive(true);
+		} else {
+			user.setActive(false);
+		}
+		
+		user.getAccessLevels().clear();
+		
+		Set<String> accessLevels = Arrays.stream(AccessLevel.values()).map(AccessLevel::name).collect(Collectors.toSet());
+
+		for (String key : form.keySet()) {
+			if (accessLevels.contains(key)) {
+				user.getAccessLevels().add(AccessLevel.valueOf(key));
+			}
+		}
+	}
+    
+	public void updateProfile(User user, String firstName, String lastName, String email, String password) {
+		if (!StringUtils.isEmpty(firstName)) {
+			user.setFirstName(firstName);
+		}
+
+		if (!StringUtils.isEmpty(lastName)) {
+			user.setLastName(lastName);
+		}
+
+		if (!StringUtils.isEmpty(password)) {
+			user.setPassword(passwordEncoder.encode(password));
+		}
+
+		String userEmail = user.getEmail();
+		boolean isEmailChanged = (email != null && !email.equals(userEmail))
+				|| (userEmail != null && !userEmail.equals(email));
+
+		if (isEmailChanged) {
+			user.setEmail(email);
+
+			if (!StringUtils.isEmpty(email)) {
+				user.setActivationCode(UUID.randomUUID().toString());
+				sendActivationCode(user);
+			}
+		}
+
+		userRepository.save(user);
+	}
 }
