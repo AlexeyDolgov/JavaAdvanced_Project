@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	  th:with="title='Доступ запрещён'">
 
-<head>
-    <title>Приёмная комиссия - доступ запрещен</title>
-</head>
+<head th:replace="fragments/header::commonHeader(_)"/>
 
 <body>
-    <h3>У Вас нет прав для просмотра данной страницы!</h1>
+    <h3>У Вас нет прав для просмотра данной страницы!</h3>
 	
 	<form th:action="@{/logout}" method="post">
         	<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>

@@ -1,38 +1,12 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	  th:with="title='Регистрация нового пользователя'">
 
-<head>
-    <title>Приёмная комиссия - регистрация нового пользователя</title>
-    <script src='https://www.google.com/recaptcha/api.js'></script>
+<head th:replace="fragments/header::commonHeader(~{::script})">
+	<script src='https://www.google.com/recaptcha/api.js'></script>	
 </head>
 
-<body>
-   	<h3>Регистрация нового пользователя</h3>
-    <div th:if="${message}">
-        <p th:text="${message}" />
-    </div>
-
-    <div th:if="${param.error}">
-      	Введены некорректыне данные!
-    </div>
-    <div th:if="${param.logout}">
-        Вы только что вышли из программы!
-    </div>
-    <form th:action="@{/registration}" method="post">
-        <div><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/></div>
-        <div><label>Имя: <input type="text" name="firstName"/></label></div>
-        <div><label>Фамилия: <input type="text" name="lastName"/></label></div>
-        <div><label>Email: <input type="text" name="email"/></label></div>
-        <div><label>Пароль: <input type="password" name="password"/></label></div>
-        <div>
-            <div class="g-recaptcha" data-sitekey="6LdnEL4UAAAAAM6h1YjSYgcOdN6BSAZBhU8pyM-m"></div>
-            <div th:if="${captchaError}">
-				<p th:text="${captchaError}" />
-			</div>            
-        </div>
-        <div><input type="submit" value="Регистрация"/></div>
-    </form>
-</body>
+<body th:replace="fragments/login::commonLogin(${title}, @{/registration}, false)"/>
 
 </html>

@@ -1,31 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	  th:with="title='Авторизация'">
 
-<head>
-    <title>Приёмная комиссия - авторизация</title>
-</head>
+<head th:replace="fragments/header::commonHeader(_)"/>
 
-<body>
-    <h3>Авторизация</h3>
-    <div th:if="${message}">
-        <p th:text="${message}"/>
-    </div>
-
-    <div th:if="${param.error}">
-      	Введены некорректыне данные!
-    </div>
-    <div th:if="${param.logout}">
-        Вы только что вышли из программы!
-    </div>
-    <form th:action="@{/login}" method="post">
-        <div><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/></div>
-        <div><label>Email: <input type="text" name="username"/></label></div>
-        <div><label>Пароль: <input type="password" name="password"/></label></div>
-        <div><label><input type="checkbox" name="remember-me" />Запомнить меня</label></div>			
-        <div><input type="submit" value="Войти"/></div>
-        <a href="/registration">Создать нового пользователя</a>
-    </form>
-</body>
+<body th:replace="fragments/login::commonLogin(${title}, @{/login}, true)"/>
 
 </html>

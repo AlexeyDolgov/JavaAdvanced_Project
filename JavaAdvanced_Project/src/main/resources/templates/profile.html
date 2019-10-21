@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	  th:with="title='Профиль пользователя'">
 
-<head>
-    <title>Приёмная комиссия - профиль пользователя</title>
-</head>
+<head th:replace="fragments/header::commonHeader(_)"/>
 
 <body>
-    <h3 th:text="|Профиль пользователя ${user.firstName} ${user.lastName}|"></h3>
+    <h3 th:text="|${title} ${user.firstName} ${user.lastName}|"></h3>
     <div th:if="${message}">
         <p th:text="${message}"/>
     </div>
