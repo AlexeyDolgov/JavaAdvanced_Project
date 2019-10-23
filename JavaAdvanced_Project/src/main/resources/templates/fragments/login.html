@@ -2,8 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
 	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
-<body th:fragment="commonLogin(title, path, isLoginForm)">
-    <h3 th:text="${title}"></h3>
+<main th:fragment="commonLogin(title, path, isLoginForm)">
+    <h3>[[${title}]]</h3>
     <div th:if="${message}">
         <p th:text="${message}"/>
     </div>
@@ -15,22 +15,36 @@
         Вы только что вышли из программы!
     </div>
     <form th:action="${path}" method="post">
-        <div><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/></div>
-        <div th:remove="${isLoginForm}?body"><label>Имя: <input type="text" name="firstName"/></label></div>
-        <div th:remove="${isLoginForm}?body"><label>Фамилия: <input type="text" name="lastName"/></label></div>
-        <div><label>Email: <input type="text" th:name="${isLoginForm}?username:email"/></label></div>        
-        <div><label>Пароль: <input type="password" name="password"/></label></div>
-        <div th:if="${isLoginForm}"><label><input type="checkbox" name="remember-me"/>Запомнить меня</label></div>			
-        <div th:if="${!isLoginForm}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <div class="form-group row" th:if="${!isLoginForm}">
+        	<label class="col-sm-2 col-form-label">Имя: </label>
+        	<input class="col-sm-6 form-control" type="text" name="firstName" placeholder="Имя"/>
+        </div>
+        <div class="form-group row" th:if="${!isLoginForm}">
+        	<label class="col-sm-2 col-form-label">Фамилия: </label>
+        	<input class="col-sm-6 form-control" type="text" name="lastName" placeholder="Фамилия"/>
+        </div>
+        <div class="form-group row">
+        	<label class="col-sm-2 col-form-label">Email: </label>
+        	<input class="col-sm-6 form-control" type="text" th:name="${isLoginForm}?username:email" placeholder="Email"/>
+        </div>        
+        <div class="form-group row">
+        	<label class="col-sm-2 col-form-label">Пароль: </label>
+        	<input class="col-sm-6 form-control" type="password" name="password" placeholder="Пароль"/>
+        </div>
+        <div class="form-check" th:if="${isLoginForm}">
+        	<input class="form-check-input" type="checkbox" name="remember-me" id="remember-me"/>
+        	<label class="form-check-label" for="remember-me">Запомнить меня</label>
+        </div>			
+        <div class="col-sm-6" th:if="${!isLoginForm}">
             <div class="g-recaptcha" data-sitekey="6LdnEL4UAAAAAM6h1YjSYgcOdN6BSAZBhU8pyM-m"></div>
             <div th:if="${captchaError}">
 				<p th:text="${captchaError}"/>
 			</div>            
         </div>
-        <div th:if="${isLoginForm}"><input type="submit" value="Войти"/></div>
-        <div th:if="${!isLoginForm}"><input type="submit" value="Регистрация"/></div>
-        <a th:if="${isLoginForm}" href="/registration">Создать нового пользователя</a>
+        <button class="btn btn-primary mt-3" type="submit">[[${isLoginForm}?Войти:Регистрация]]</button>
+        <div><a th:if="${isLoginForm}" href="/registration">Создать нового пользователя</a></div>
     </form>
-</body>
+</main>
 
 </html>

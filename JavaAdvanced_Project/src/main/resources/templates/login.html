@@ -3,8 +3,8 @@
 	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
 	  th:with="title='Авторизация'">
 
-<head th:replace="fragments/header::commonHeader(_)"/>
-
-<body th:replace="fragments/login::commonLogin(${title}, @{/login}, true)"/>
+<th:block th:replace="fragments/common::commonPage(_, ~{::main})">
+	<main th:replace="fragments/login::commonLogin(${title}, @{/login}, true)"/>
+</th:block>
 
 </html>

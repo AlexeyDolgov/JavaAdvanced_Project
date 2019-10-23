@@ -3,15 +3,16 @@
 	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
 	  th:with="title='Доступ запрещён'">
 
-<head th:replace="fragments/header::commonHeader(_)"/>
-
-<body>
-    <h3>У Вас нет прав для просмотра данной страницы!</h3>
-	
-	<form th:action="@{/logout}" method="post">
+<th:block th:replace="fragments/common::commonPage(_, ~{::main})">
+	<main>
+		<h3>[[${title}]]</h3>
+		<p class="lead">У Вас нет прав для просмотра данной страницы!</p>
+		
+		<form th:action="@{/logout}" method="post">
         	<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <input type="submit" value="Войти под другим пользователем"/>
-    </form>  
-</body>
+            <button class="btn btn-primary mt-3" type="submit">Войти под другим пользователем</button>            
+    	</form>  
+	</main>
+</th:block>
 
 </html>

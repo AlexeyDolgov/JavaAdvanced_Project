@@ -3,32 +3,34 @@
 	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
 	  th:with="title='Пользователи'">
 
-<head th:replace="fragments/header::commonHeader(_)"/>
-
-<body>
-	<h3>[[${title}]]</h3>
-    <table>
-        <thead>
-            <tr>
-            	<th>Имя</th>
-            	<th>Фамилия</th>
-                <th>Email</th>
-                <th>Активен</th>
-                <th>Уровень доступа</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="user: ${users}">
-                <td th:text="${user.firstName}"/>
-                <td th:text="${user.lastName}"/>
-                <td th:text="${user.email}"/>
-                <td th:text="${user.active}"/>
-                <td><span th:each="accessLevel, iterStat: ${user.accessLevels}" th:text="${!iterStat.last} ? ${accessLevel} + ', ' : ${accessLevel}"></span></td>
-                <td><a th:href="@{'/user/' + ${user.id}}">ред.</a></td>
-            </tr>
-        </tbody>
-    </table>
-</body>
+<th:block th:replace="fragments/common::commonPage(_, ~{::main})">
+	<main>
+		<h3>[[${title}]]</h3>
+		<table class="table table-bordered">
+			<thead class="thead-light">
+				<tr>
+					<th scope="col">id</th>
+					<th scope="col">Имя</th>
+					<th scope="col">Фамилия</th>
+					<th scope="col">Email</th>
+					<th scope="col">Активен</th>
+					<th scope="col">Уровень доступа</th>
+					<th scope="col"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="user: ${users}">
+					<th th:text="${user.id}"/>
+					<td th:text="${user.firstName}"/>
+					<td th:text="${user.lastName}"/>
+					<td th:text="${user.email}"/>
+					<td th:text="${user.active}"/>
+					<td><span th:each="accessLevel, iterStat: ${user.accessLevels}" th:text="${!iterStat.last} ? ${accessLevel} + ', ' : ${accessLevel}"></span></td>
+					<td><a th:href="@{'/user/' + ${user.id}}">ред.</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</main>
+</th:block>
 
 </html>
