@@ -1,11 +1,15 @@
 package ua.lviv.lgs.admissionsOffice.controller;
 
 import java.util.Collections;
+import java.util.Map;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +39,24 @@ public class RegistrationController {
 	}
 
 	@PostMapping("/registration")
-	public String registerUser(@RequestParam("g-recaptcha-response") String reCaptchaResponse, User user, Model model, RedirectAttributes redir) {
+	public String registerUser(
+			@RequestParam("g-recaptcha-response") String reCaptchaResponse,
+			@RequestParam String confirmPassword,
+			@Valid User user,
+			BindingResult bindingResult,
+			Model model,
+			RedirectAttributes redir) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
+            model.mergeAttributes(errors);
+            return "registration";
+        }
+        
+        if (user.getPassword() != null && !user.getPassword().equals(confirmPassword)) {
+        	model.addAttribute("confirmPasswordError", "Введённые пароли не совпадают!");
+        	return "registration";
+        }
+		
 		String url = String.format(CAPTCHA_URL, secret, reCaptchaResponse);
         CaptchaResponse captchaResponse = restTemplate.postForObject(url, Collections.emptyList(), CaptchaResponse.class);
 

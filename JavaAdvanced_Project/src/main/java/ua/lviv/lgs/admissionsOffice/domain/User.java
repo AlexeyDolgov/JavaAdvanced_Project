@@ -17,7 +17,10 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -32,12 +35,17 @@ public class User implements UserDetails {
 	@Column(name = "user_id")
 	private Integer id;
 	@Column
+	@NotBlank(message = "Имя пользователя не может быть пустым!")
 	private String firstName;
 	@Column
+	@NotBlank(message = "Фамилия пользователя не может быть пустым!")
 	private String lastName;
 	@Column
+	@NotBlank(message = "Email пользователя не может быть пустым!")
+	@Email(message = "Email пользователя введён некорректно!")
 	private String email;
 	@Column
+	@Length(min = 6, message = "Пароль пользователя должен быть не менее 6 символов!")
 	private String password;
 	@Column
 	private boolean active;
