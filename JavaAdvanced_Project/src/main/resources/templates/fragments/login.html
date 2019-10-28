@@ -4,7 +4,7 @@
 
 <main th:fragment="commonLogin(title, path, isLoginForm)">
     <h3>[[${title}]]</h3>
-	<div th:if="${message}" class="alert alert-danger" role="alert">
+	<div th:if="${message}" th:class="|alert alert-${messageType}|" role="alert">
 		[[${message}]]
 	</div>
 	<div th:if="${param.error}" class="alert alert-danger" role="alert">

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,9 +47,14 @@ public class RegistrationController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redir) {
-        if (bindingResult.hasErrors()) {
+		String url = String.format(CAPTCHA_URL, secret, reCaptchaResponse);
+		CaptchaResponse captchaResponse = restTemplate.postForObject(url, Collections.emptyList(), CaptchaResponse.class);
+
+		if (StringUtils.isEmpty(confirmPassword) || bindingResult.hasErrors() || !captchaResponse.isSuccess()) {
             Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
             model.mergeAttributes(errors);
+            model.addAttribute("confirmPasswordError", "Пароль пользователя должен быть не менее 6 символов!");
+            model.addAttribute("captchaError", "Заполните, пожалуйста, капчу!");
             return "registration";
         }
         
@@ -56,16 +62,9 @@ public class RegistrationController {
         	model.addAttribute("confirmPasswordError", "Введённые пароли не совпадают!");
         	return "registration";
         }
-		
-		String url = String.format(CAPTCHA_URL, secret, reCaptchaResponse);
-        CaptchaResponse captchaResponse = restTemplate.postForObject(url, Collections.emptyList(), CaptchaResponse.class);
-
-        if (!captchaResponse.isSuccess()) {
-            model.addAttribute("captchaError", "Заполните, пожалуйста, капчу!");
-            return "registration";
-        }
         
 		if (!userService.addUser(user)) {
+			model.addAttribute("messageType", "danger");
 			model.addAttribute("message", "Такой пользователь уже существует!");
 			return "registration";
 		}
@@ -79,8 +78,10 @@ public class RegistrationController {
         boolean isActivated = userService.activateUser(code);
 
         if (isActivated) {
+        	model.addAttribute("messageType", "success");
             model.addAttribute("message", "Пользователь успешно активирован!");
         } else {
+        	model.addAttribute("messageType", "danger");
             model.addAttribute("message", "Код активации не найден!");
         }
 
