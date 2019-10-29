@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "subject")
@@ -18,6 +19,7 @@ public class Subject {
 	@Column(name = "subject_id")
 	private Integer id;
 	@Column
+	@NotBlank(message = "Название предмета не может быть пустым!")
 	private String title;
 
 	@ManyToMany(mappedBy = "examSubjects")

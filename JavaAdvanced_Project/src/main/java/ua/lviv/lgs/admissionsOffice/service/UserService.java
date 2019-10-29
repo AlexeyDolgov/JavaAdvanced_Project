@@ -110,6 +110,8 @@ public class UserService implements UserDetailsService {
 				user.getAccessLevels().add(AccessLevel.valueOf(key));
 			}
 		}
+		
+		userRepository.save(user);
 	}
     
 	public void updateProfile(User user, String firstName, String lastName, String email, String password) {
