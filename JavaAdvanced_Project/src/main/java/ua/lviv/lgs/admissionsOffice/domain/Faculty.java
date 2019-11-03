@@ -77,9 +77,7 @@ public class Faculty {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((examSubjects == null) ? 0 : examSubjects.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((specialities == null) ? 0 : specialities.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
@@ -93,20 +91,10 @@ public class Faculty {
 		if (getClass() != obj.getClass())
 			return false;
 		Faculty other = (Faculty) obj;
-		if (examSubjects == null) {
-			if (other.examSubjects != null)
-				return false;
-		} else if (!examSubjects.equals(other.examSubjects))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
-			return false;
-		if (specialities == null) {
-			if (other.specialities != null)
-				return false;
-		} else if (!specialities.equals(other.specialities))
 			return false;
 		if (title == null) {
 			if (other.title != null)

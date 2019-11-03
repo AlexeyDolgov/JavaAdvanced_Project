@@ -1,5 +1,6 @@
 package ua.lviv.lgs.admissionsOffice.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -26,7 +27,8 @@ public class SubjectController {
 	
 	@GetMapping
 	public String viewSubjectList(Model model) {
-		model.addAttribute("subjects", subjectService.findAll());
+		List<Subject> subjectsList = subjectService.findAll();
+		model.addAttribute("subjects", subjectsList);
 
 		return "subjectList";
 	}
@@ -63,7 +65,7 @@ public class SubjectController {
 	}
 
 	@PostMapping("/edit")
-	public String saveSubject(@Valid Subject subject, BindingResult bindingResult, Model model) {
+	public String saveSubject(@RequestParam("id") Subject subject, @Valid Subject updatedSubject, BindingResult bindingResult, Model model) {
 		if (bindingResult.hasErrors()) {
 			Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
 			model.mergeAttributes(errors);
@@ -72,7 +74,14 @@ public class SubjectController {
 			return "subjectEditor";
 		}
 
-		subjectService.saveSubject(subject);
+		subjectService.saveSubject(updatedSubject);
+
+		return "redirect:/subject";
+	}
+	
+	@GetMapping("/delete")
+	public String deleteSubject(@RequestParam("id") Subject subject) {
+		subjectService.deleteSubject(subject);
 
 		return "redirect:/subject";
 	}

@@ -32,4 +32,8 @@ public class SubjectService {
 	public void saveSubject(Subject subject) {
 		subjectRepository.save(subject);
 	}
+
+	public void deleteSubject(Subject subject) {
+		subjectRepository.delete(subject);		
+	}
 }

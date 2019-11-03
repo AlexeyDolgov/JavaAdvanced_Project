@@ -19,7 +19,12 @@
 				<tr th:each="subject: ${subjects}">
 					<th th:text="${subject.id}"/>
 					<td th:text="${subject.title}"/>
-					<td><a th:href="@{'/subject/edit?id=' + ${subject.id}}">ред.</a></td>
+					<td>
+						<a th:href="@{'/subject/edit?id=' + ${subject.id}}">ред.</a>
+						<span th:if="${subject.faculties.isEmpty()}">  |  
+							<a th:href="@{'/subject/delete?id=' + ${subject.id}}">удал.</a>
+						</span>
+					</td>
 				</tr>
 			</tbody>
 		</table>
