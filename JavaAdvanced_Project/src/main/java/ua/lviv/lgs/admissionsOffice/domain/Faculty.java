@@ -14,6 +14,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "faculty")
@@ -23,6 +24,7 @@ public class Faculty {
 	@Column(name = "faculty_id")
 	private Integer id;
 	@Column
+	@NotBlank(message = "Название факультета не может быть пустым!")
 	private String title;
 	
 	@ManyToMany(cascade = CascadeType.ALL)

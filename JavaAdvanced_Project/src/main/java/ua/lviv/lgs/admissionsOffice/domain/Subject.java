@@ -32,6 +32,11 @@ public class Subject {
 		this.title = title;
 	}
 
+	public Subject(Integer id, String title) {
+		this.id = id;
+		this.title = title;
+	}
+
 	public Integer getId() {
 		return id;
 	}
