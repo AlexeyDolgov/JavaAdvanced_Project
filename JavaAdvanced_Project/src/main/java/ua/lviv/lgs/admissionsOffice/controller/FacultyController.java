@@ -90,7 +90,7 @@ public class FacultyController {
 	}
 	
 	@GetMapping("/delete")
-	public String deleteSubject(@RequestParam("id") Faculty faculty) {
+	public String deleteFaculty(@RequestParam("id") Faculty faculty) {
 		facultyService.deleteFaculty(faculty);
 
 		return "redirect:/faculty";

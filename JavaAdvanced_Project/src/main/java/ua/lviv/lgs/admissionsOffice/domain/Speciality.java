@@ -14,6 +14,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "speciality")
@@ -23,8 +26,11 @@ public class Speciality {
 	@Column(name = "speciality_id")
 	private Integer id;
 	@Column
+	@NotBlank(message = "Название специальности не может быть пустым!")
 	private String title;
 	@Column
+	@NotNull(message = "План набора не может быть пустым!")
+	@Min(value = 1, message = "План набора не может быть равен нулю!")
 	private Integer enrollmentPlan;
 
 	@ManyToOne
@@ -98,12 +104,9 @@ public class Speciality {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((applicants == null) ? 0 : applicants.hashCode());
-		result = prime * result + ((applications == null) ? 0 : applications.hashCode());
-		result = prime * result + ((enrollmentPlan == null) ? 0 : enrollmentPlan.hashCode());
-		result = prime * result + ((faculty == null) ? 0 : faculty.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + ((enrollmentPlan == null) ? 0 : enrollmentPlan.hashCode());
 		return result;
 	}
 
@@ -116,26 +119,6 @@ public class Speciality {
 		if (getClass() != obj.getClass())
 			return false;
 		Speciality other = (Speciality) obj;
-		if (applicants == null) {
-			if (other.applicants != null)
-				return false;
-		} else if (!applicants.equals(other.applicants))
-			return false;
-		if (applications == null) {
-			if (other.applications != null)
-				return false;
-		} else if (!applications.equals(other.applications))
-			return false;
-		if (enrollmentPlan == null) {
-			if (other.enrollmentPlan != null)
-				return false;
-		} else if (!enrollmentPlan.equals(other.enrollmentPlan))
-			return false;
-		if (faculty == null) {
-			if (other.faculty != null)
-				return false;
-		} else if (!faculty.equals(other.faculty))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -145,6 +128,11 @@ public class Speciality {
 			if (other.title != null)
 				return false;
 		} else if (!title.equals(other.title))
+			return false;
+		if (enrollmentPlan == null) {
+			if (other.enrollmentPlan != null)
+				return false;
+		} else if (!enrollmentPlan.equals(other.enrollmentPlan))
 			return false;
 		return true;
 	}

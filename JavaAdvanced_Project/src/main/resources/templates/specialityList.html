@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	  th:with="title='Специальности'">
+
+<th:block th:replace="fragments/common::commonPage(_, ~{::main})">
+	<main>
+		<h3>[[${title}]]</h3>
+		<a class="btn btn-primary mb-3" th:href="@{'/speciality/create'}">Новая специальность</a>
+		<table class="table table-bordered">
+			<thead class="thead-light">
+				<tr>
+					<th scope="col">id</th>
+					<th scope="col">Название</th>
+					<th scope="col">Факультет</th>
+					<th scope="col">План набора</th>
+					<th scope="col"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="speciality: ${specialities}">
+					<th th:text="${speciality.id}"/>
+					<td th:text="${speciality.title}"/>
+					<td th:text="${speciality.faculty.title}"/>
+					<td th:text="${speciality.enrollmentPlan}"/>
+					<td>
+						<a th:href="@{'/speciality/edit?id=' + ${speciality.id}}">ред.</a>
+						<span th:if="${speciality.applicants.isEmpty() AND speciality.applications.isEmpty()}">  |  
+							<a th:href="@{'/speciality/delete?id=' + ${speciality.id}}">удал.</a>
+						</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</main>
+</th:block>
+
+</html>

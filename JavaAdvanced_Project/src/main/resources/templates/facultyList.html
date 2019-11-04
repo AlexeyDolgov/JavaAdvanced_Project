@@ -12,6 +12,7 @@
 				<tr>
 					<th scope="col">id</th>
 					<th scope="col">Название</th>
+					<th scope="col">Специальности</th>
 					<th scope="col">Необходимые предметы</th>
 					<th scope="col"></th>
 				</tr>
@@ -20,7 +21,8 @@
 				<tr th:each="faculty: ${faculties}">
 					<th th:text="${faculty.id}"/>
 					<td th:text="${faculty.title}"/>
-					<td><span th:each="examSubject, iterStat: ${faculty.examSubjects}" th:text="${!iterStat.last} ? ${examSubject.title} + ', ' : ${examSubject.title}"></span></td>
+					<td><div th:each="speciality, iterStat: ${faculty.specialities}" th:text="${!iterStat.last} ? ${speciality.title} + ', ' : ${speciality.title}"></div></td>
+					<td><div th:each="examSubject, iterStat: ${faculty.examSubjects}" th:text="${!iterStat.last} ? ${examSubject.title} + ', ' : ${examSubject.title}"></div></td>
 					<td>
 						<a th:href="@{'/faculty/edit?id=' + ${faculty.id}}">ред.</a>
 						<span th:if="${faculty.examSubjects.isEmpty() AND faculty.specialities.isEmpty()}">  |  

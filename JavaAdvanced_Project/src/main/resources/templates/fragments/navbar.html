@@ -19,11 +19,15 @@
 			<li class="nav-item" sec:authorize="hasAuthority('ADMIN')">
 				<a class="nav-link" th:href="@{/user}">Пользователи</a>
 			</li>
-			<li class="nav-item" sec:authorize="hasAuthority('ADMIN')">
-				<a class="nav-link" th:href="@{/subject}">Предметы</a>
-			</li>
-			<li class="nav-item" sec:authorize="hasAuthority('ADMIN')">
-				<a class="nav-link" th:href="@{/faculty}">Факультеты</a>
+			<li class="nav-item dropdown" sec:authorize="hasAuthority('ADMIN')">
+				<a class="nav-link dropdown-toggle" data-toggle="dropdown" id="navbarDropdown" role="button" aria-haspopup="true" aria-expanded="false" href="#">
+					Университет
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<a class="dropdown-item" th:href="@{/faculty}">Факультеты</a>
+					<a class="dropdown-item" th:href="@{/speciality}">Специальности</a>
+					<a class="dropdown-item" th:href="@{/subject}">Предметы</a>
+				</div>
 			</li>
 		</ul>
 		
