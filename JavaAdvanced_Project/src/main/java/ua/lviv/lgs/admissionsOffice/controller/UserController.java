@@ -1,5 +1,6 @@
 package ua.lviv.lgs.admissionsOffice.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import ua.lviv.lgs.admissionsOffice.domain.AccessLevel;
 import ua.lviv.lgs.admissionsOffice.domain.User;
@@ -75,9 +77,19 @@ public class UserController {
 	}
 
 	@PostMapping("profile")	
-	public String updateProfile(@AuthenticationPrincipal User user, @RequestParam String firstName,
-			@RequestParam String lastName, @RequestParam String email, @RequestParam String password,
-			@RequestParam String confirmPassword, Model model) {
+	public String updateProfile(
+			@AuthenticationPrincipal User user,
+			@RequestParam String firstName,
+			@RequestParam String lastName,
+			@RequestParam String email,
+			@RequestParam String password,
+			@RequestParam String confirmPassword,
+			@RequestParam(required = false) String birthDate,
+			@RequestParam(required = false) String city,
+			@RequestParam(required = false) String school,
+			@RequestParam(required = false) MultipartFile photo,
+			@RequestParam(required = false) String removePhotoFlag,
+			Model model) throws IOException {
 		Map<String, String> errors = new HashMap<>();
 		if (StringUtils.isEmpty(firstName)) {
 			errors.put("firstNameError", "Имя пользователя не может быть пустым!");			
@@ -103,15 +115,25 @@ public class UserController {
 			errors.put("confirmPasswordError", "Введённые пароли не совпадают!");
         }
 		
+		if (user.getAccessLevels().contains(AccessLevel.valueOf("USER"))) {
+			if (!photo.isEmpty() && !photo.getContentType().contains("image")) {
+				errors.put("photoError", "Файл фотографии должен быть графическим изображением!");
+			}
+		}
+				
 		if (!errors.isEmpty()) {
 			model.mergeAttributes(errors);
 			model.addAttribute("firstName", firstName);
 			model.addAttribute("lastName", lastName);
 			model.addAttribute("email", email);
+			model.addAttribute("birthDate", birthDate);
+			model.addAttribute("city", city);
+			model.addAttribute("school", school);
+			
 			return "profile";			
 		}
 		
-		userService.updateProfile(user, firstName, lastName, email, password);
+		userService.updateProfile(user, firstName, lastName, email, password, birthDate, city, school, photo, removePhotoFlag);
 		
 		return "redirect:/main";
 	}

@@ -41,11 +41,14 @@ create table subject_faculty (
 ) engine=MyISAM;
 
 create table applicant (
-	user_id integer not null,
+	user_user_id integer not null,
 	birth_date date,
 	city varchar(255),
 	school varchar(255),
-	primary key (user_id)
+	file_name varchar(255),
+	file_type varchar(255),
+	file_data longblob,
+	primary key (user_user_id)
 ) engine=MyISAM;
 
 create table speciality_applicant (
@@ -94,7 +97,7 @@ alter table subject_faculty
 
 alter table applicant
 	add constraint applicant__user__fk
-	foreign key (user_id) references user (user_id);
+	foreign key (user_user_id) references user (user_id);
 	
 alter table speciality_applicant
 	add constraint speciality_applicant__speciality__fk
@@ -102,11 +105,11 @@ alter table speciality_applicant
 
 alter table speciality_applicant
 	add constraint speciality_applicant__applicant__fk
-	foreign key (user_id) references applicant (user_id);
+	foreign key (user_id) references applicant (user_user_id);
 
 alter table application
 	add constraint application__applicant__fk
-	foreign key (applicant_id) references applicant (user_id);
+	foreign key (applicant_id) references applicant (user_user_id);
 
 alter table application
 	add constraint application__speciality__fk

@@ -5,7 +5,13 @@
 
 <th:block th:replace="fragments/common::commonPage(_, ~{::main})">
 	<main>
-    	<h3 th:inline="text">Привет, [[${#authentication.principal.firstName}]] [[${#authentication.principal.lastName}]]!</h3>
+		<h3 th:inline="text">Привет, 
+			[[${session.user}?${session.user.firstName}:${#authentication.principal.firstName}]]
+			[[${session.user}?${session.user.lastName}:${#authentication.principal.lastName}]]!
+		</h3>
+		<p th:if="${session.user.applicant} == null" class="lead" sec:authorize="hasAuthority('USER')">
+			Для начала работы расскажите о себе, заполнив <a th:href="@{/user/profile}">анкетные данные</a>.
+		</p>
 	</main>
 </th:block>
     

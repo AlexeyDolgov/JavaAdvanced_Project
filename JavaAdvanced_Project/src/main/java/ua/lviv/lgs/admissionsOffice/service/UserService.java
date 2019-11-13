@@ -1,13 +1,18 @@
 package ua.lviv.lgs.admissionsOffice.service;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,15 +20,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import ua.lviv.lgs.admissionsOffice.dao.ApplicantRepository;
 import ua.lviv.lgs.admissionsOffice.dao.UserRepository;
 import ua.lviv.lgs.admissionsOffice.domain.AccessLevel;
+import ua.lviv.lgs.admissionsOffice.domain.Applicant;
 import ua.lviv.lgs.admissionsOffice.domain.User;
 
 @Service
 public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ApplicantRepository applicantRepository;
 	@Autowired
 	private MailSender mailSender;
 	@Autowired
@@ -114,7 +124,8 @@ public class UserService implements UserDetailsService {
 		userRepository.save(user);
 	}
     
-	public void updateProfile(User user, String firstName, String lastName, String email, String password) {
+	public void updateProfile(User user, String firstName, String lastName, String email, String password,
+			String birthDate, String city, String school, MultipartFile photo, String removePhotoFlag) throws IOException {
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		user.setPassword(passwordEncoder.encode(password));
@@ -129,7 +140,48 @@ public class UserService implements UserDetailsService {
 			user.setActivationCode(UUID.randomUUID().toString());
 			sendActivationCode(user);
 		}
-
+		
+		if (user.getAccessLevels().contains(AccessLevel.valueOf("USER"))) {
+			Optional<Applicant> applicantFromDb = applicantRepository.findById(user.getId());
+			Applicant applicant = applicantFromDb.orElse(new Applicant());
+			
+			applicant.setId(user.getId());
+			
+			if (!birthDate.isEmpty()) {
+				applicant.setBirthDate(LocalDate.parse(birthDate));
+			}
+			
+			if (!city.isEmpty()) {
+				applicant.setCity(city);
+			}
+			
+			if (!school.isEmpty()) {
+				applicant.setSchool(school);
+			}
+			
+			boolean removePhoto = (removePhotoFlag == null) ? false : true;
+			if (!photo.isEmpty() || !applicantFromDb.isPresent() || removePhoto) {
+				applicant.setFileName(StringUtils.cleanPath(photo.getOriginalFilename()));
+				applicant.setFileType(photo.getContentType());
+				applicant.setFileData(photo.getBytes());
+			}
+			
+			applicant.setUser(user);
+			user.setApplicant(applicant);
+		}
+		
 		userRepository.save(user);
+	}
+	
+	public String parseFileData(User user) throws UnsupportedEncodingException {
+		String fileBase64Encoded = new String();
+		
+		if (user.getApplicant() != null) {
+			byte[] fileBytes = user.getApplicant().getFileData();
+			byte[] fileEncodeBase64 = Base64.encodeBase64(fileBytes);
+			fileBase64Encoded = new String(fileEncodeBase64, "UTF-8");
+		}
+		
+		return fileBase64Encoded;
 	}
 }
