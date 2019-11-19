@@ -12,6 +12,9 @@
 		<p th:if="${session.user.applicant} == null" class="lead" sec:authorize="hasAuthority('USER')">
 			Для начала работы расскажите о себе, заполнив <a th:href="@{/user/profile}">анкетные данные</a>.
 		</p>
+		<p th:if="${session.user?.applicant}" class="lead" sec:authorize="hasAuthority('USER')">
+			Теперь можно <a th:href="@{/application}">подать заявку</a> на участие во вступительном конкурсе на одну из специальностей.
+		</p>
 	</main>
 </th:block>
     

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<main th:fragment="commonApplication(title, path, isEditForm)">
+	<h3>[[${title}]]</h3>
+	<div th:if="${message}" class="alert alert-danger" role="alert">
+		[[${message}]]
+	</div>
+	<form th:object="${aplication}" th:action="${path}" method="post">
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+		<input type="hidden" th:name="applicant" th:value="${session.user.applicant.id}"/>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Специальность: </label>
+			<div class="col-sm-6">
+				<select th:class="${specialityError}?'form-control is-invalid':'form-control'"
+					name="speciality" th:onchange="viewSubjectsBySpeciality()"> 
+					<option value="" th:disabled="${isEditForm}">Специальность</option>
+					<option th:each="speciality : ${specialities}" th:value="${speciality.id}" th:text="${speciality.title}"
+						th:selected="${isEditForm}?${speciality.id.equals(aplication.speciality.id)}"
+						th:disabled="${isEditForm}?${!speciality.id.equals(aplication.speciality.id)}">
+					</option>
+				</select>
+				<div th:if="${specialityError}" class="invalid-feedback" th:text="${specialityError}"></div>
+			</div>
+		</div>
+		<div th:if="${!isEditForm}" id="subjects"></div>
+		<div th:if="${isEditForm}">
+			<h5>Баллы по ВНО:</h5>
+			<div th:each="znoMark : *{znoMarks}">
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label">[[${znoMark.key.title}]]: </label>
+					<div class="col-sm-6">
+						<input th:class="${subject__${znoMark.key.id}__Error}?'form-control is-invalid':'form-control'"
+							type="text" th:name="|subject${znoMark.key.id}|" th:value="${znoMark.value}" th:placeholder="${znoMark.key.title}"/>
+						<div th:if="${subject__${znoMark.key.id}__Error}" class="invalid-feedback" th:text="${subject__${znoMark.key.id}__Error}"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Средний балл аттестата: </label>
+			<div class="col-sm-6">
+				<input th:class="${attMarkError}?'form-control is-invalid':'form-control'"
+					type="text" name="attMark" th:value="${aplication}?*{attMark}" placeholder="Средний балл аттестата"/>
+				<div th:if="${attMarkError}" class="invalid-feedback" th:text="${attMarkError}"></div>
+			</div>
+		</div>
+		<button class="btn btn-primary" type="submit">[[${isEditForm}?Сохранить:Создать]]</button>
+	</form>
+	<script>
+	function viewSubjectsBySpeciality() {
+		var speciality = $("select[name='speciality']").val();
+		var subjects = null;
+		
+		if (speciality != '') {	
+			jQuery.get('../subjectBySpeciality', {id: speciality}, function(data) {
+				if (data !== '') {
+					subjects = data;
+				}
+			}).done(
+				function() {
+					var formContent = '<h5>Баллы по ВНО:</h5>';
+					jQuery.each(subjects, function(i, value) {
+						formContent +=
+							"<div class='form-group row'>"
+								+ "<label class='col-sm-2 col-form-label'>" + value.title + ": </label>"
+								+ "<div class='col-sm-6'>"
+									+ "<input class='form-control'"
+										+ "type='text' name='subject" + value.id + "' placeholder='" + value.title +"'/>"
+								+ "</div>"
+							+ "</div>"					
+					});
+
+					$('#subjects').html(formContent);
+				});
+		} else {
+			$('#subjects').html('');
+		}
+	}
+	</script>
+</main>
+
+</html>
