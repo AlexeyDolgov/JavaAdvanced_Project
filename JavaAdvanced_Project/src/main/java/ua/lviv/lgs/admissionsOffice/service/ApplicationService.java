@@ -14,6 +14,7 @@ import ua.lviv.lgs.admissionsOffice.dao.ApplicationRepository;
 import ua.lviv.lgs.admissionsOffice.dao.SubjectRepository;
 import ua.lviv.lgs.admissionsOffice.domain.Applicant;
 import ua.lviv.lgs.admissionsOffice.domain.Application;
+import ua.lviv.lgs.admissionsOffice.domain.RatingList;
 import ua.lviv.lgs.admissionsOffice.domain.Subject;
 
 @Service
@@ -22,7 +23,9 @@ public class ApplicationService {
 	private ApplicationRepository applicationRepository;
 	@Autowired
 	private SubjectRepository subjectRepository;
-
+	@Autowired
+	private RatingListService ratingListService;
+	
 	public List<Application> findByApplicant(Applicant applicant) {
 		return applicationRepository.findByApplicant(applicant);
 	}
@@ -39,12 +42,20 @@ public class ApplicationService {
 		application.setZnoMarks(znoMarks);
 
 		applicationRepository.save(application);
+		
+		RatingList ratingList = ratingListService.initializeRatingList(application);
+		application.setRatingList(ratingList);
+		
+		applicationRepository.save(application);
 		return true;
 	}
 	
 	public void updateApplication(Application application, Map<String, String> form) {
 		Map<Subject, Integer> znoMarks = parseZnoMarks(form);
 		application.setZnoMarks(znoMarks);
+		
+		RatingList ratingList = ratingListService.initializeRatingList(application);
+		application.setRatingList(ratingList);
 		
 		applicationRepository.save(application);
 	}

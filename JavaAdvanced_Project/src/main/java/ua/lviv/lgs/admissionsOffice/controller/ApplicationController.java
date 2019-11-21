@@ -82,7 +82,6 @@ public class ApplicationController {
 	
 	@PostMapping("/edit")
 	public String updateApplication(@RequestParam("id") Application application, @RequestParam Map<String, String> form, @Valid Application updatedApplication, BindingResult bindingResult, Model model) {
-		updatedApplication.setSpeciality(application.getSpeciality());
 		Map<String, String> znoMarksErrors = applicationService.getZnoMarksErrors(form);
 		if (bindingResult.hasErrors() || !znoMarksErrors.isEmpty()) {
 			Map<String, String> errors = ControllerUtils.getErrors(bindingResult);

@@ -2,6 +2,7 @@ package ua.lviv.lgs.admissionsOffice.domain;
 
 import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -10,11 +11,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -22,7 +22,6 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "application")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Application {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +46,9 @@ public class Application {
 	@Min(value = 1, message = "Средний балл аттестата не может быть равен нулю!")
 	@Max(value = 200, message = "Средний балл аттестата не может быть больше 200!")
 	private Integer attMark;
+	
+	@OneToOne(mappedBy = "application", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private RatingList ratingList;
 
 	
 	public Application() {	}
@@ -96,6 +98,14 @@ public class Application {
 
 	public void setAttMark(Integer attMark) {
 		this.attMark = attMark;
+	}
+
+	public RatingList getRatingList() {
+		return ratingList;
+	}
+
+	public void setRatingList(RatingList ratingList) {
+		this.ratingList = ratingList;
 	}
 
 	@Override

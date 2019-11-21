@@ -73,10 +73,10 @@ create table zno_marks (
 ) engine=MyISAM;
 
 create table rating_list (
-	application_id integer not null,
+	application_application_id integer not null,
 	total_mark double precision,
 	accepted bit,
-	primary key (application_id)
+	primary key (application_application_id)
 ) engine=MyISAM;
 
 alter table access_level
@@ -125,4 +125,4 @@ alter table zno_marks
 
 alter table rating_list
 	add constraint rating_list__application__fk
-	foreign key (application_id) references application (application_id);
+	foreign key (application_application_id) references application (application_id);
