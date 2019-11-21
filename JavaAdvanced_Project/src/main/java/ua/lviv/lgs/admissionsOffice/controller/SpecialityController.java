@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import ua.lviv.lgs.admissionsOffice.domain.Speciality;
 import ua.lviv.lgs.admissionsOffice.service.FacultyService;
+import ua.lviv.lgs.admissionsOffice.service.RatingListService;
 import ua.lviv.lgs.admissionsOffice.service.SpecialityService;
 
 @Controller
@@ -27,11 +28,15 @@ public class SpecialityController {
 	private SpecialityService specialityService;
 	@Autowired
 	public FacultyService facultyService;
+	@Autowired
+	private RatingListService ratingListService;
 	
 	@GetMapping
 	public String viewSpecialityList(Model model) {
 		List<Speciality> specialitiesList = specialityService.findAll();
+		Map<Speciality, Integer> submittedApps = ratingListService.parseApplicationsBySpeciality();
 		model.addAttribute("specialities", specialitiesList);
+		model.addAttribute("submittedApps", submittedApps);
 
 		return "specialityList";
 	}

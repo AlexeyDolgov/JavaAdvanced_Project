@@ -14,15 +14,21 @@
 					<th scope="col">Название</th>
 					<th scope="col">Факультет</th>
 					<th scope="col">План набора</th>
+					<th th:if="${!submittedApps.isEmpty()}" scope="col">Подано документов</th>
 					<th scope="col"></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="speciality: ${specialities}">
+				<tr th:each="speciality : ${specialities}">
 					<th th:text="${speciality.id}"/>
 					<td th:text="${speciality.title}"/>
 					<td th:text="${speciality.faculty.title}"/>
 					<td th:text="${speciality.enrollmentPlan}"/>
+					<td th:each="submittedApp : ${submittedApps}" th:if="${submittedApp.key.equals(speciality)}">
+						<span th:switch="${submittedApp.value}">
+							<span th:case="0">[[${submittedApp.value}]]</span>
+							<span th:case="*"><a th:href="@{'/ratingList/speciality?id=' + ${speciality.id}}">[[${submittedApp.value}]]</a></span>
+						</span>
 					<td>
 						<a th:href="@{'/speciality/edit?id=' + ${speciality.id}}">ред.</a>
 						<span th:if="${speciality.applicants.isEmpty() AND speciality.applications.isEmpty()}">  |  

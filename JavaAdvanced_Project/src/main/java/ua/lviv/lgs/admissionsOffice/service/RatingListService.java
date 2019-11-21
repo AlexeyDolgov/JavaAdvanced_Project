@@ -1,20 +1,33 @@
 package ua.lviv.lgs.admissionsOffice.service;
 
+import java.math.BigInteger;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ua.lviv.lgs.admissionsOffice.dao.ApplicantRepository;
 import ua.lviv.lgs.admissionsOffice.dao.RatingListRepository;
+import ua.lviv.lgs.admissionsOffice.dao.SpecialityRepository;
+import ua.lviv.lgs.admissionsOffice.domain.Applicant;
 import ua.lviv.lgs.admissionsOffice.domain.Application;
 import ua.lviv.lgs.admissionsOffice.domain.RatingList;
+import ua.lviv.lgs.admissionsOffice.domain.Speciality;
 import ua.lviv.lgs.admissionsOffice.domain.Subject;
 
 @Service
 public class RatingListService {
 	@Autowired
 	private RatingListRepository ratingListRepository;
+	@Autowired
+	private SpecialityRepository specialityRepository;
+	@Autowired
+	private ApplicantRepository applicantRepository;
 	
 	public Optional<RatingList> findById(Integer id) {
 		return ratingListRepository.findById(id);
@@ -45,5 +58,39 @@ public class RatingListService {
 		totalMark = totalMark/i;
 		
 		return totalMark;
+	}
+
+	public Map<Speciality, Integer> parseApplicationsBySpeciality() {
+		List<Object[]> submittedAppsFromDb = ratingListRepository.countApplicationsBySpeciality();
+		List<Speciality> specialitiesList = specialityRepository.findAll();
+		Map<Speciality, Integer> submittedApps = new HashMap<>();
+		
+		for (Speciality speciality : specialitiesList) {
+			for (Object[] object : submittedAppsFromDb) {
+				
+				if (((Integer) object[0]).equals(speciality.getId())) {
+					submittedApps.put(speciality, ((BigInteger) object[1]).intValue());
+					break;
+				} else {
+					submittedApps.put(speciality, 0);
+				}
+			}
+		}
+		return submittedApps;
+	}
+	
+	public Map<Double, Applicant> parseApplicantsRankBySpeciality(Integer specialityId) {
+		List<Object[]> applicantsRankFromDb = ratingListRepository.getApplicantsRankBySpeciality(specialityId);
+		List<Applicant> applicantsList = applicantRepository.findAll();
+		Map<Double, Applicant> applicantsRank = new TreeMap<>(Collections.reverseOrder());
+		
+		for (Applicant applicant : applicantsList) {
+			for (Object[] object : applicantsRankFromDb) {
+				if (((Integer) object[1]).equals(applicant.getId())) {
+					applicantsRank.put((Double) object[0], applicant);
+				}
+			}
+		}
+		return applicantsRank;
 	}
 }
