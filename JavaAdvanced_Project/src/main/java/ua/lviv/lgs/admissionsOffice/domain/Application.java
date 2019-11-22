@@ -1,5 +1,6 @@
 package ua.lviv.lgs.admissionsOffice.domain;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
@@ -22,7 +23,9 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "application")
-public class Application {
+public class Application implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "application_id")

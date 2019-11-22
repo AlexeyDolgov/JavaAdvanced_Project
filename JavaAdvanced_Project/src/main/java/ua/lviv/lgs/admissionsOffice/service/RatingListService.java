@@ -6,7 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import ua.lviv.lgs.admissionsOffice.domain.Application;
 import ua.lviv.lgs.admissionsOffice.domain.RatingList;
 import ua.lviv.lgs.admissionsOffice.domain.Speciality;
 import ua.lviv.lgs.admissionsOffice.domain.Subject;
+import ua.lviv.lgs.admissionsOffice.dto.SpecialityDTO;
 
 @Service
 public class RatingListService {
@@ -92,5 +96,22 @@ public class RatingListService {
 			}
 		}
 		return applicantsRank;
+	}
+	
+	public List<Speciality> findSpecialitiesByApplicant(Integer applicantId) {
+		List<Integer> specialitiesByApplicantFromDb = ratingListRepository.findSpecialitiesByApplicant(applicantId);
+		List<Speciality> specialitiesList = specialityRepository.findAll();
+		
+		return specialitiesList.stream()
+				.filter(speciality -> specialitiesByApplicantFromDb.stream()
+						.anyMatch(specialityId -> specialityId.equals(speciality.getId())))
+				.collect(Collectors.toList());
+	}
+	
+	public Set<SpecialityDTO> parseSpecialitiesByApplicant(Integer applicantId) {
+		List<Speciality> specialities = findSpecialitiesByApplicant(applicantId);
+
+		return specialities.stream().map(speciality -> new SpecialityDTO(speciality.getId(), speciality.getTitle()))
+				.collect(Collectors.toCollection(TreeSet::new));
 	}
 }

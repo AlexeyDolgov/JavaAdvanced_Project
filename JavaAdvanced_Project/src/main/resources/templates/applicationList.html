@@ -6,7 +6,10 @@
 <th:block th:replace="fragments/common::commonPage(_, ~{::main})">
 	<main>
 		<h3>[[${title}]]</h3>
-		<a class="btn btn-primary mb-3" th:href="@{'/application/create'}">Новый заявка</a>
+		<a th:if="${#lists.size(applications) < 5}" class="btn btn-primary mb-3" th:href="@{'/application/create'}">Новая заявка</a>
+		<div th:if="${#lists.size(applications) >= 5}" class="alert alert-info" role="alert">
+        	Заявление можно подать не более, чем на 5 специальностей!
+    	</div>
 		<table class="table table-bordered">
 			<thead class="thead-light">
 				<tr>

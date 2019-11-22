@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ua.lviv.lgs.admissionsOffice.domain.Application;
 import ua.lviv.lgs.admissionsOffice.domain.User;
 import ua.lviv.lgs.admissionsOffice.service.ApplicationService;
+import ua.lviv.lgs.admissionsOffice.service.RatingListService;
 import ua.lviv.lgs.admissionsOffice.service.SpecialityService;
 
 @Controller
@@ -29,13 +31,16 @@ public class ApplicationController {
 	private ApplicationService applicationService;
 	@Autowired
 	private SpecialityService specialityService;
+	@Autowired
+	private RatingListService ratingListService;
 	
 	@GetMapping
-	public String viewApplicationList(HttpServletRequest request, Model model) {
+	public String viewApplicationList(HttpServletRequest request, HttpSession session, Model model) {
 		User user = (User) request.getSession().getAttribute("user");
 		List<Application> applicationsList = applicationService.findByApplicant(user.getApplicant());
 		model.addAttribute("applications", applicationsList);
-
+		session.setAttribute("specialities", ratingListService.findSpecialitiesByApplicant(user.getId()));
+		
 		return "applicationList";
 	}
 	

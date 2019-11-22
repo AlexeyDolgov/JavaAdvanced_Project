@@ -12,9 +12,29 @@
 		<p th:if="${session.user.applicant} == null" class="lead" sec:authorize="hasAuthority('USER')">
 			Для начала работы расскажите о себе, заполнив <a th:href="@{/user/profile}">анкетные данные</a>.
 		</p>
-		<p th:if="${session.user?.applicant}" class="lead" sec:authorize="hasAuthority('USER')">
+		<p th:if="${session.user?.applicant} AND ${#lists.size(session.specialities) < 5}" class="lead" sec:authorize="hasAuthority('USER')">
 			Теперь можно <a th:href="@{/application}">подать заявку</a> на участие во вступительном конкурсе на одну из специальностей.
 		</p>
+		<div th:if="${!session.specialities.isEmpty()}">
+			<p class="lead" sec:authorize="hasAuthority('USER')">
+				Ниже можно ознакомиться с рейтингом абитуриентов по выбранным специальностям.
+			<div class="row">
+				<div th:each="speciality : ${session.specialities}">
+					<div class="card mx-2 my-2" style="width: 18rem">
+						<div class="card-body">
+						<h5 class="card-title">[[${speciality.title}]]</h5>
+						<h6 class="card-subtitle mb-4 text-muted">[[${speciality.faculty.title}]] факультет</h6>
+						<p class="card-text"><b>План набора: </b>[[${speciality.enrollmentPlan}]]</p>
+						<p class="card-text" th:each="submittedApp : ${submittedApps}" th:if="${submittedApp.key.equals(speciality)}">
+							<b>Подано документов: </b>[[${submittedApp.value}]]
+						</p>
+						<a th:href="@{'/ratingList/speciality?id=' + ${speciality.id}}" class="card-link">Рейтинг-лист</a>						
+						</div>
+					</div>
+				</div>
+			</div>
+			</p>
+		</div>
 	</main>
 </th:block>
     

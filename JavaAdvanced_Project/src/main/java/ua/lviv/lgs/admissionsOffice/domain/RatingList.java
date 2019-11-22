@@ -1,5 +1,7 @@
 package ua.lviv.lgs.admissionsOffice.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -9,7 +11,9 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "rating_list")
-public class RatingList implements Comparable<RatingList> {
+public class RatingList implements Serializable, Comparable<RatingList> {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@Column
 	private Integer id;

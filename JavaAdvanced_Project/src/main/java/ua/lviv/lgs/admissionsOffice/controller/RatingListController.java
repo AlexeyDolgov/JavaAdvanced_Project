@@ -1,6 +1,10 @@
 package ua.lviv.lgs.admissionsOffice.controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,10 +24,11 @@ public class RatingListController {
 	private RatingListService ratingListService;
 	
 	@GetMapping("/speciality")
-	public String viewApplicantsRankBySpeciality(@RequestParam("id") Speciality speciality, Model model) {
+	public String viewApplicantsRankBySpeciality(@RequestParam("id") Speciality speciality, HttpServletRequest request, Model model) throws URISyntaxException {
 		Map<Double, Applicant> applicantsRank = ratingListService.parseApplicantsRankBySpeciality(speciality.getId());
 		model.addAttribute("speciality", speciality);
 		model.addAttribute("applicantsRank", applicantsRank);
+		model.addAttribute("refererURI", new URI(request.getHeader("referer")).getPath());
 
 		return "ratingList";
 	}

@@ -1,5 +1,6 @@
 package ua.lviv.lgs.admissionsOffice.domain;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -13,7 +14,9 @@ import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "subject")
-public class Subject {
+public class Subject implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "subject_id")

@@ -27,4 +27,13 @@ public interface RatingListRepository extends JpaRepository<RatingList, Integer>
 							"WHERE app.speciality_id = ?1 " +
 							"ORDER BY rl.total_mark DESC", nativeQuery = true)
 	List<Object[]> getApplicantsRankBySpeciality(Integer specialityId);
+	
+	@Query(value = "SELECT s.speciality_id " +
+						"FROM rating_list AS rl " +
+							"INNER JOIN application AS app " +
+								"ON rl.application_application_id = app.application_id " +
+							"INNER JOIN speciality AS s " +
+								"ON app.speciality_id = s.speciality_id " +
+							"WHERE app.applicant_id = ?1", nativeQuery = true)
+	List<Integer> findSpecialitiesByApplicant(Integer applicantId);
 }

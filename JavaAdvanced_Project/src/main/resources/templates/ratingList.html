@@ -17,14 +17,14 @@
 			</thead>
 			<tbody>
 				<tr th:each="entry, iterStat : ${applicantsRank}">
-					<th th:text="${iterStat.count}"/>
-					<td th:text="${entry.value.user.firstName}"/>
-					<td th:text="${entry.value.user.lastName}"/>
-					<td th:text="${#numbers.formatDecimal(entry.key, 3, 2)}"/>
+					<th th:class="${session.user.id == entry.value.user.id}?'table-success'" th:text="${iterStat.count}"/>
+					<td th:class="${session.user.id == entry.value.user.id}?'table-success'" th:text="${entry.value.user.firstName}"/>
+					<td th:class="${session.user.id == entry.value.user.id}?'table-success'" th:text="${entry.value.user.lastName}"/>
+					<td th:class="${session.user.id == entry.value.user.id}?'table-success'" th:text="${#numbers.formatDecimal(entry.key, 3, 2)}"/>
 				</tr>
 			</tbody>
 		</table>
-		<div class="mt-4"><a href="/speciality">Назад</a></div>
+		<div class="mt-4"><a th:href="@{${refererURI}}">Назад</a></div>
 	</main>
 </th:block>
 
