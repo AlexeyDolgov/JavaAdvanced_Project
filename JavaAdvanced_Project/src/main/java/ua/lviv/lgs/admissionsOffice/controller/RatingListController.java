@@ -25,7 +25,7 @@ public class RatingListController {
 	
 	@GetMapping("/speciality")
 	public String viewApplicantsRankBySpeciality(@RequestParam("id") Speciality speciality, HttpServletRequest request, Model model) throws URISyntaxException {
-		Map<Double, Applicant> applicantsRank = ratingListService.parseApplicantsRankBySpeciality(speciality.getId());
+		Map<Applicant, Double> applicantsRank = ratingListService.parseApplicantsRankBySpeciality(speciality.getId());
 		model.addAttribute("speciality", speciality);
 		model.addAttribute("applicantsRank", applicantsRank);
 		model.addAttribute("refererURI", new URI(request.getHeader("referer")).getPath());

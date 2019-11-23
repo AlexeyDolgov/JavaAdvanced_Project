@@ -20,7 +20,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "applicant")
-public class Applicant implements Serializable {
+public class Applicant implements Serializable, Comparable<Applicant> {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
@@ -182,6 +182,11 @@ public class Applicant implements Serializable {
 		} else if (!school.equals(other.school))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(Applicant applicant) {
+		return (this.id > applicant.id) ? 1 : -1;
 	}
 
 	@Override

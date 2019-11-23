@@ -18,7 +18,7 @@ public interface RatingListRepository extends JpaRepository<RatingList, Integer>
 							"GROUP BY s.speciality_id", nativeQuery = true)
 	List<Object[]> countApplicationsBySpeciality();
 	
-	@Query(value = "SELECT rl.total_mark, a.user_user_id " +
+	@Query(value = "SELECT a.user_user_id, rl.total_mark " +
 						"FROM rating_list AS rl " +
 							"INNER JOIN application AS app " +
 								"ON rl.application_application_id = app.application_id " +

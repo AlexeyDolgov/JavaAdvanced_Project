@@ -1,13 +1,13 @@
 package ua.lviv.lgs.admissionsOffice.service;
 
 import java.math.BigInteger;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -83,19 +83,22 @@ public class RatingListService {
 		return submittedApps;
 	}
 	
-	public Map<Double, Applicant> parseApplicantsRankBySpeciality(Integer specialityId) {
+	public Map<Applicant, Double> parseApplicantsRankBySpeciality(Integer specialityId) {
 		List<Object[]> applicantsRankFromDb = ratingListRepository.getApplicantsRankBySpeciality(specialityId);
 		List<Applicant> applicantsList = applicantRepository.findAll();
-		Map<Double, Applicant> applicantsRank = new TreeMap<>(Collections.reverseOrder());
+		Map<Applicant, Double> applicantsRank = new HashMap<>();
+		Comparator<Map.Entry<Applicant, Double>> mapValuesComparator = Comparator.comparing(Map.Entry::getValue);
 		
 		for (Applicant applicant : applicantsList) {
 			for (Object[] object : applicantsRankFromDb) {
-				if (((Integer) object[1]).equals(applicant.getId())) {
-					applicantsRank.put((Double) object[0], applicant);
+				if (((Integer) object[0]).equals(applicant.getId())) {
+					applicantsRank.put(applicant, (Double) object[1]);
 				}
 			}
 		}
-		return applicantsRank;
+		return applicantsRank.entrySet().stream().sorted(mapValuesComparator.reversed())
+				.collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue(),
+						(oldValue, newValue) -> oldValue, LinkedHashMap::new));
 	}
 	
 	public List<Speciality> findSpecialitiesByApplicant(Integer applicantId) {

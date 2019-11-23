@@ -17,10 +17,10 @@
 			</thead>
 			<tbody>
 				<tr th:each="entry, iterStat : ${applicantsRank}">
-					<th th:class="${session.user.id == entry.value.user.id}?'table-success'" th:text="${iterStat.count}"/>
-					<td th:class="${session.user.id == entry.value.user.id}?'table-success'" th:text="${entry.value.user.firstName}"/>
-					<td th:class="${session.user.id == entry.value.user.id}?'table-success'" th:text="${entry.value.user.lastName}"/>
-					<td th:class="${session.user.id == entry.value.user.id}?'table-success'" th:text="${#numbers.formatDecimal(entry.key, 3, 2)}"/>
+					<th th:class="${session.user.id == entry.key.user.id}?'table-success'" th:text="${iterStat.count}"/>
+					<td th:class="${session.user.id == entry.key.user.id}?'table-success'" th:text="${entry.key.user.firstName}"/>
+					<td th:class="${session.user.id == entry.key.user.id}?'table-success'" th:text="${entry.key.user.lastName}"/>
+					<td th:class="${session.user.id == entry.key.user.id}?'table-success'" th:text="${#numbers.formatDecimal(entry.value, 3, 2)}"/>
 				</tr>
 			</tbody>
 		</table>
