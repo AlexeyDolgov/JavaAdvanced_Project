@@ -7,7 +7,7 @@
 	<div th:if="${message}" class="alert alert-danger" role="alert">
 		[[${message}]]
 	</div>
-	<form th:object="${aplication}" th:action="${path}" method="post">
+	<form th:object="${aplication}" th:action="${path}" method="post" enctype="multipart/form-data">
 		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 		<input type="hidden" th:name="applicant" th:value="${session.user.applicant.id}"/>
 		<div class="form-group row">
@@ -46,6 +46,28 @@
 				<div th:if="${attMarkError}" class="invalid-feedback" th:text="${attMarkError}"></div>
 			</div>
 		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Подтверждающие документы: </label>
+			<div class="col-sm-6">
+				<div class="custom-file">
+					<input th:class="${supportingDocumentError}?'custom-file-input is-invalid':'custom-file-input'"
+						type="file" id="files" name="files" multiple
+						onchange="$(this).next('.custom-file-label').addClass('selected').html(
+							$(this)[0].files.length == 0 ? 'Выберите файлы...' :
+								( $(this)[0].files.length == 1 ? $(this).val().split('\\').pop() : 
+									'Число файлов: ' + $(this)[0].files.length ) )" />
+					<label for="customFile" class="custom-file-label text-muted text-truncate">Выберите файлы...</label>
+					<div th:if="${supportingDocumentError}" class="invalid-feedback" th:text="${supportingDocumentError}"></div>
+					<small class="form-text text-muted" id="filesList"></small>
+					<small th:if="${isEditForm}" class="form-text text-muted ml-4" th:each="supDoc: ${aplication?.supportingDocuments}">
+						<input class="form-check-input" type="checkbox" th:name="|delete${supDoc.id}|" title="Удалить"/>
+						<label class="form-check-label">
+							<strong><a th:href="@{|${downloadURI}${supDoc.id}|}">[[${supDoc.fileName}]]</a></strong> ([[${supDoc.fileType}]]) - [[${supDoc.fileData.length}]] bytes
+						</label>
+					</small>
+				</div>
+			</div>
+		</div>
 		<button class="btn btn-primary" type="submit">[[${isEditForm}?Сохранить:Создать]]</button>
 	</form>
 	<script>
@@ -78,6 +100,19 @@
 			$('#subjects').html('');
 		}
 	}
+	
+	function handleFileSelect(event) {
+		var files = event.target.files;
+
+		var output = [];
+		for (var i = 0, file; file = files[i]; i++) {
+			output.push('<li><strong>', file.name, '</strong> (', file.type || 'n/a', ') - ', file.size, ' bytes</li>');
+		}
+
+		document.getElementById('filesList').innerHTML = '<ul>' + output.join('') + '</ul>';
+	}
+
+	document.getElementById('files').addEventListener('change',	handleFileSelect, false);	
 	</script>
 </main>
 

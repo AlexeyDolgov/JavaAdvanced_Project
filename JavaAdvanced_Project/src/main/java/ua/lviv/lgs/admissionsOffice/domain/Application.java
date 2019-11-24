@@ -2,6 +2,7 @@ package ua.lviv.lgs.admissionsOffice.domain;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -15,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
@@ -43,13 +45,16 @@ public class Application implements Serializable {
 	@CollectionTable(name = "zno_marks")
 	@MapKeyColumn(name = "subject_id")
 	private Map<Subject, Integer> znoMarks;
-	
+
 	@Column
 	@NotNull(message = "Средний балл аттестата не может быть пустым!")
 	@Min(value = 1, message = "Средний балл аттестата не может быть равен нулю!")
 	@Max(value = 200, message = "Средний балл аттестата не может быть больше 200!")
 	private Integer attMark;
-	
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "application")
+	private Set<SupportingDocument> supportingDocuments;
+
 	@OneToOne(mappedBy = "application", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private RatingList ratingList;
 
@@ -101,6 +106,14 @@ public class Application implements Serializable {
 
 	public void setAttMark(Integer attMark) {
 		this.attMark = attMark;
+	}
+
+	public Set<SupportingDocument> getSupportingDocuments() {
+		return supportingDocuments;
+	}
+
+	public void setSupportingDocuments(Set<SupportingDocument> supportingDocuments) {
+		this.supportingDocuments = supportingDocuments;
 	}
 
 	public RatingList getRatingList() {

@@ -1,5 +1,6 @@
 package ua.lviv.lgs.admissionsOffice.service;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import ua.lviv.lgs.admissionsOffice.dao.ApplicationRepository;
 import ua.lviv.lgs.admissionsOffice.dao.SubjectRepository;
@@ -16,6 +18,7 @@ import ua.lviv.lgs.admissionsOffice.domain.Applicant;
 import ua.lviv.lgs.admissionsOffice.domain.Application;
 import ua.lviv.lgs.admissionsOffice.domain.RatingList;
 import ua.lviv.lgs.admissionsOffice.domain.Subject;
+import ua.lviv.lgs.admissionsOffice.domain.SupportingDocument;
 
 @Service
 public class ApplicationService {
@@ -24,13 +27,15 @@ public class ApplicationService {
 	@Autowired
 	private SubjectRepository subjectRepository;
 	@Autowired
+	SupportingDocumentService supportingDocumentService;
+	@Autowired
 	private RatingListService ratingListService;
 	
 	public List<Application> findByApplicant(Applicant applicant) {
 		return applicationRepository.findByApplicant(applicant);
 	}
 	
-	public boolean createApplication(Application application, Map<String, String> form) {
+	public boolean createApplication(Application application, Map<String, String> form, MultipartFile[] supportingDocuments) throws IOException {
 		Optional<Application> applicationFromDb = applicationRepository
 				.findByApplicantAndSpeciality(application.getApplicant(), application.getSpeciality());
 		
@@ -40,8 +45,11 @@ public class ApplicationService {
 
 		Map<Subject, Integer> znoMarks = parseZnoMarks(form);
 		application.setZnoMarks(znoMarks);
-
+		
 		applicationRepository.save(application);
+		
+		Set<SupportingDocument> supportingDocumentsSet = supportingDocumentService.initializeSupportingDocumentSet(application,	supportingDocuments);		
+		application.setSupportingDocuments(supportingDocumentsSet);
 		
 		RatingList ratingList = ratingListService.initializeRatingList(application);
 		application.setRatingList(ratingList);
@@ -49,10 +57,15 @@ public class ApplicationService {
 		applicationRepository.save(application);
 		return true;
 	}
-	
-	public void updateApplication(Application application, Map<String, String> form) {
+
+	public void updateApplication(Application application, Map<String, String> form, MultipartFile[] supportingDocuments) throws IOException {
 		Map<Subject, Integer> znoMarks = parseZnoMarks(form);
 		application.setZnoMarks(znoMarks);
+		
+		supportingDocumentService.deleteSupportingDocuments(form);
+		
+		Set<SupportingDocument> supportingDocumentsSet = supportingDocumentService.initializeSupportingDocumentSet(application,	supportingDocuments);		
+		application.setSupportingDocuments(supportingDocumentsSet);
 		
 		RatingList ratingList = ratingListService.initializeRatingList(application);
 		application.setRatingList(ratingList);

@@ -1,5 +1,6 @@
 package ua.lviv.lgs.admissionsOffice.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,12 +17,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import ua.lviv.lgs.admissionsOffice.domain.Application;
 import ua.lviv.lgs.admissionsOffice.domain.User;
 import ua.lviv.lgs.admissionsOffice.service.ApplicationService;
 import ua.lviv.lgs.admissionsOffice.service.RatingListService;
 import ua.lviv.lgs.admissionsOffice.service.SpecialityService;
+import ua.lviv.lgs.admissionsOffice.service.SupportingDocumentService;
 
 @Controller
 @RequestMapping("/application")
@@ -31,6 +35,8 @@ public class ApplicationController {
 	private ApplicationService applicationService;
 	@Autowired
 	private SpecialityService specialityService;
+	@Autowired
+	private SupportingDocumentService supportingDocumentService;
 	@Autowired
 	private RatingListService ratingListService;
 	
@@ -52,11 +58,15 @@ public class ApplicationController {
 	}
 	
 	@PostMapping("/create")
-	public String createApplication(@RequestParam Map<String, String> form, @Valid Application application, BindingResult bindingResult, Model model) {
+	public String createApplication(@RequestParam Map<String, String> form,	@RequestParam("files") MultipartFile[] supportingDocuments,
+			@Valid Application application, BindingResult bindingResult, Model model) throws IOException {
 		Map<String, String> znoMarksErrors = applicationService.getZnoMarksErrors(form);
-		if (bindingResult.hasErrors() || form.get("speciality") == "" || !znoMarksErrors.isEmpty()) {
+		Map<String, String> supportingDocumentErrors = supportingDocumentService.getSupportingDocumentErrors(supportingDocuments);
+		
+		if (bindingResult.hasErrors() || form.get("speciality") == "" || !znoMarksErrors.isEmpty() || !supportingDocumentErrors.isEmpty()) {
             Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
             model.mergeAttributes(errors);
+            model.mergeAttributes(supportingDocumentErrors);
             model.addAttribute(!znoMarksErrors.isEmpty() ? "message" : "", "При заполнении баллов по ВНО были обнаружены ошибки: " +
             		znoMarksErrors.values() + ". Попробуйте заполнить форму еще раз!");
             model.addAttribute(form.get("speciality") == "" ? "specialityError" : "", "Поле Специальность не может быть пустым!");
@@ -65,7 +75,7 @@ public class ApplicationController {
             return "applicationCreator";
         }
    		
-		boolean applicationExists = !applicationService.createApplication(application, form);
+		boolean applicationExists = !applicationService.createApplication(application, form, supportingDocuments);
 
 		if (applicationExists) {
 			model.addAttribute("message", "На выбранную специальность заявка уже существует!");
@@ -81,24 +91,31 @@ public class ApplicationController {
 	public String viewEditForm(@RequestParam("id") Application application, Model model) {
 		model.addAttribute("aplication", application);
 		model.addAttribute("specialities", specialityService.findAll());
+		model.addAttribute("downloadURI", ServletUriComponentsBuilder.fromCurrentContextPath().path("/downloadFile/").toUriString());
 		
 		return "applicationEditor";
 	}
-	
+
 	@PostMapping("/edit")
-	public String updateApplication(@RequestParam("id") Application application, @RequestParam Map<String, String> form, @Valid Application updatedApplication, BindingResult bindingResult, Model model) {
+	public String updateApplication(@RequestParam("id") Application application, @RequestParam Map<String, String> form,
+			@RequestParam("files") MultipartFile[] supportingDocuments, @Valid Application updatedApplication,
+			BindingResult bindingResult, Model model) throws IOException {
 		Map<String, String> znoMarksErrors = applicationService.getZnoMarksErrors(form);
-		if (bindingResult.hasErrors() || !znoMarksErrors.isEmpty()) {
+		Map<String, String> supportingDocumentErrors = supportingDocumentService.getSupportingDocumentErrors(supportingDocuments);
+
+		if (bindingResult.hasErrors() || !znoMarksErrors.isEmpty() || !supportingDocumentErrors.isEmpty()) {
 			Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
 			model.mergeAttributes(errors);
 			model.mergeAttributes(znoMarksErrors);
+			model.mergeAttributes(supportingDocumentErrors);
 			model.addAttribute("aplication", application);
 			model.addAttribute("specialities", specialityService.findAll());
+			model.addAttribute("downloadURI", ServletUriComponentsBuilder.fromCurrentContextPath().path("/downloadFile/").toUriString());
 			
 			return "applicationEditor";
 		}
 		
-		applicationService.updateApplication(updatedApplication, form);
+		applicationService.updateApplication(updatedApplication, form, supportingDocuments);
 
 		return "redirect:/application";
 	}

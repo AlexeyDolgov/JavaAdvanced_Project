@@ -72,6 +72,15 @@ create table zno_marks (
 	primary key (application_application_id, zno_marks_key)
 ) engine=MyISAM;
 
+create table supporting_document (
+	supporting_document_id varchar(255),
+	file_name varchar(255),
+	file_type varchar(255),
+	file_data longblob,
+	application_id integer,
+	primary key (supporting_document_id)
+) engine=MyISAM;
+
 create table rating_list (
 	application_application_id integer not null,
 	total_mark double precision,
@@ -122,6 +131,10 @@ alter table zno_marks
 alter table zno_marks
 	add constraint zno_marks__subject__fk
 	foreign key (zno_marks_key) references subject (subject_id);
+
+alter table supporting_document
+	add constraint supporting_document__application__fk
+	foreign key (application_id) references application (application_id);
 
 alter table rating_list
 	add constraint rating_list__application__fk
