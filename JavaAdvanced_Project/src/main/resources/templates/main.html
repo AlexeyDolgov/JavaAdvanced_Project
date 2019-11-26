@@ -9,32 +9,67 @@
 			[[${session.user}?${session.user.firstName}:${#authentication.principal.firstName}]]
 			[[${session.user}?${session.user.lastName}:${#authentication.principal.lastName}]]!
 		</h3>
-		<p th:if="${session.user.applicant} == null" class="lead" sec:authorize="hasAuthority('USER')">
-			Для начала работы расскажите о себе, заполнив <a th:href="@{/user/profile}">анкетные данные</a>.
-		</p>
-		<p th:if="${session.user?.applicant} AND ${#lists.size(session.specialities) < 5}" class="lead" sec:authorize="hasAuthority('USER')">
-			Теперь можно <a th:href="@{/application}">подать заявку</a> на участие во вступительном конкурсе на одну из специальностей.
-		</p>
-		<div th:if="${!session.specialities.isEmpty()}">
-			<p class="lead" sec:authorize="hasAuthority('USER')">
-				Ниже можно ознакомиться с рейтингом абитуриентов по выбранным специальностям.
-			<div class="row">
-				<div th:each="speciality : ${session.specialities}">
-					<div class="card mx-2 my-2" style="width: 18rem">
-						<div class="card-body">
-						<h5 class="card-title">[[${speciality.title}]]</h5>
-						<h6 class="card-subtitle mb-4 text-muted">[[${speciality.faculty.title}]] факультет</h6>
-						<p class="card-text"><b>План набора: </b>[[${speciality.enrollmentPlan}]]</p>
-						<p class="card-text" th:each="submittedApp : ${submittedApps}" th:if="${submittedApp.key.equals(speciality)}">
-							<b>Подано документов: </b>[[${submittedApp.value}]]
-						</p>
-						<a th:href="@{'/ratingList/speciality?id=' + ${speciality.id}}" class="card-link">Рейтинг-лист</a>						
+
+		<div sec:authorize="hasAuthority('USER')">
+			<p th:if="${session.user.applicant} == null" class="lead">
+				Для начала работы расскажите о себе, заполнив <a th:href="@{/user/profile}">анкетные данные</a>.
+			</p>
+			<p th:if="${session.user?.applicant} AND ${#lists.size(session.specialities) < 5}" class="lead">
+				Теперь можно <a th:href="@{/application}">подать заявку</a> на участие во вступительном конкурсе на одну из специальностей.
+			</p>
+			<div th:if="${!session.specialities.isEmpty()}">
+				<p class="lead">
+					Ниже можно ознакомиться с рейтингом абитуриентов по выбранным специальностям.
+				</p>
+				<div class="row">
+					<div th:each="speciality : ${session.specialities}">
+						<div class="card mx-2 my-2" style="width: 18rem">
+							<div class="card-body">
+								<h5 class="card-title">[[${speciality.title}]]</h5>
+								<h6 class="card-subtitle mb-4 text-muted">[[${speciality.faculty.title}]] факультет</h6>
+								<p class="card-text"><b>План набора: </b>[[${speciality.enrollmentPlan}]]</p>
+								<p class="card-text" th:each="submittedApp : ${submittedApps}" th:if="${submittedApp.key.equals(speciality)}">
+									<b>Подано документов: </b>[[${submittedApp.value}]]
+								</p>
+								<a th:href="@{'/ratingList/speciality?id=' + ${speciality.id}}" class="card-link">Рейтинг-лист</a>						
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			</p>
 		</div>
+
+		<div sec:authorize="hasAuthority('ADMIN')">
+			<div th:if="${!session.notAcceptedApps.isEmpty()}">
+				<p class="lead">
+					Необходимо обработать перечень новых вступительных заявок от абитуриентов.
+				</p>
+				<div class="row">
+					<div th:each="app : ${session.notAcceptedApps}">
+						<div class="card mx-2 my-2" style="width: 18rem">
+							<div class="card-body">
+								<h5 class="card-title">[[${app.application.applicant.user.firstName}]] [[${app.application.applicant.user.lastName}]]</h5>
+								<h6 class="card-subtitle mb-4 text-muted">[[${app.application.speciality.title}]]</h6>
+								<p class="card-text"><b>Баллы по предметам: </b>
+									<div th:each="znoMark: ${app.application.znoMarks}">
+										[[${znoMark.key.title}]]: [[${znoMark.value}]] бал.,
+									</div>
+									<div>Ср. балл аттестата: [[${app.application.attMark}]] бал.</div>
+								</p>
+								<p class="card-text"><b>Рейтинговый балл: </b>[[${#numbers.formatDecimal(app.totalMark, 3, 2)}]] бал.</p>
+								<a th:href="@{'/application/edit?id=' + ${app.id}}" class="card-link">Открыть заявку</a>						
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div th:if="${session.notAcceptedApps.isEmpty()}">
+				<p class="lead">
+					Все заявки абитуриентов обработаны. Новых вступительных заявок нет.
+				</p>
+			</div>
+		</div>
+		
 	</main>
 </th:block>
     

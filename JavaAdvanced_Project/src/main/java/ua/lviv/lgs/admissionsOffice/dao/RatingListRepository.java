@@ -36,4 +36,6 @@ public interface RatingListRepository extends JpaRepository<RatingList, Integer>
 								"ON app.speciality_id = s.speciality_id " +
 							"WHERE app.applicant_id = ?1", nativeQuery = true)
 	List<Integer> findSpecialitiesByApplicant(Integer applicantId);
+
+	List<RatingList> findByAcceptedFalseAndRejectionMessageIsNull();
 }

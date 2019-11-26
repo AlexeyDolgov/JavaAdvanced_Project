@@ -85,6 +85,7 @@ create table rating_list (
 	application_application_id integer not null,
 	total_mark double precision,
 	accepted bit,
+	rejection_message varchar(255),
 	primary key (application_application_id)
 ) engine=MyISAM;
 

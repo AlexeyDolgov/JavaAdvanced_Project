@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import ua.lviv.lgs.admissionsOffice.domain.AccessLevel;
 import ua.lviv.lgs.admissionsOffice.domain.User;
 import ua.lviv.lgs.admissionsOffice.service.RatingListService;
 import ua.lviv.lgs.admissionsOffice.service.UserService;
@@ -31,9 +32,16 @@ public class MainController {
 		User userFromDb = userService.findById(user.getId());
 		
 		session.setAttribute("user", userFromDb);
-		session.setAttribute("photo", userService.parseFileData(userFromDb));
-		session.setAttribute("specialities", ratingListService.findSpecialitiesByApplicant(userFromDb.getId()));
-		model.addAttribute("submittedApps", ratingListService.parseApplicationsBySpeciality());
+		
+		if (userFromDb.getAccessLevels().contains(AccessLevel.valueOf("USER"))) {
+			session.setAttribute("photo", userService.parseFileData(userFromDb));
+			session.setAttribute("specialities", ratingListService.findSpecialitiesByApplicant(userFromDb.getId()));
+			model.addAttribute("submittedApps", ratingListService.parseApplicationsBySpeciality());
+		}
+		
+		if (userFromDb.getAccessLevels().contains(AccessLevel.valueOf("ADMIN"))) {
+			session.setAttribute("notAcceptedApps", ratingListService.findNotAcceptedApps());
+		}
 		
 		return "main";
 	}

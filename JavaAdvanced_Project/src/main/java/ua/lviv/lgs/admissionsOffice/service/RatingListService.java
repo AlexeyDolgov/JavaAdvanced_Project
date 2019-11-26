@@ -37,7 +37,7 @@ public class RatingListService {
 		return ratingListRepository.findById(id);
 	}
 
-	public RatingList initializeRatingList(Application application) {
+	public RatingList initializeRatingList(Application application, Map<String, String> form) {
 		Optional<RatingList> ratingListFromDb = findById(application.getId());
 		RatingList ratingList = ratingListFromDb.orElse(new RatingList());
 		
@@ -45,6 +45,22 @@ public class RatingListService {
 		
 		Double totalMark = calculateTotalMark(application.getZnoMarks(), application.getAttMark());
 		ratingList.setTotalMark(totalMark);
+				
+		for (String key : form.keySet()) {
+			if (key.equals("rejectionMessage") && !form.get(key).isEmpty()) {
+				ratingList.setRejectionMessage(form.get(key));
+			} else {
+				ratingList.setRejectionMessage(null);
+			}
+		}
+		
+		for (String key : form.keySet()) {
+			if (key.equals("accept")) {
+				ratingList.setAccepted(true);
+				ratingList.setRejectionMessage(null);
+			}
+		}
+
 		ratingList.setApplication(application);
 		
 		return ratingList;
@@ -116,5 +132,9 @@ public class RatingListService {
 
 		return specialities.stream().map(speciality -> new SpecialityDTO(speciality.getId(), speciality.getTitle()))
 				.collect(Collectors.toCollection(TreeSet::new));
+	}
+
+	public List<RatingList> findNotAcceptedApps() {
+		return ratingListRepository.findByAcceptedFalseAndRejectionMessageIsNull();
 	}
 }

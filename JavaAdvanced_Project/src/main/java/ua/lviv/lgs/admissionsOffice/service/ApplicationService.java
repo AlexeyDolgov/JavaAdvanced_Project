@@ -51,7 +51,7 @@ public class ApplicationService {
 		Set<SupportingDocument> supportingDocumentsSet = supportingDocumentService.initializeSupportingDocumentSet(application,	supportingDocuments);		
 		application.setSupportingDocuments(supportingDocumentsSet);
 		
-		RatingList ratingList = ratingListService.initializeRatingList(application);
+		RatingList ratingList = ratingListService.initializeRatingList(application, form);
 		application.setRatingList(ratingList);
 		
 		applicationRepository.save(application);
@@ -67,7 +67,7 @@ public class ApplicationService {
 		Set<SupportingDocument> supportingDocumentsSet = supportingDocumentService.initializeSupportingDocumentSet(application,	supportingDocuments);		
 		application.setSupportingDocuments(supportingDocumentsSet);
 		
-		RatingList ratingList = ratingListService.initializeRatingList(application);
+		RatingList ratingList = ratingListService.initializeRatingList(application, form);
 		application.setRatingList(ratingList);
 		
 		applicationRepository.save(application);

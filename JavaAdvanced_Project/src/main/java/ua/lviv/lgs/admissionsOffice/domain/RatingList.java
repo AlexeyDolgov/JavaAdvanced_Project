@@ -21,6 +21,8 @@ public class RatingList implements Serializable, Comparable<RatingList> {
 	private Double totalMark;
 	@Column
 	private boolean accepted;
+	@Column
+	private String rejectionMessage;
 
 	@OneToOne
     @MapsId
@@ -56,6 +58,14 @@ public class RatingList implements Serializable, Comparable<RatingList> {
 
 	public void setAccepted(boolean accepted) {
 		this.accepted = accepted;
+	}
+
+	public String getRejectionMessage() {
+		return rejectionMessage;
+	}
+
+	public void setRejectionMessage(String rejectionMessage) {
+		this.rejectionMessage = rejectionMessage;
 	}
 
 	public Application getApplication() {

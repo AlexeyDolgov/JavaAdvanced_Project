@@ -29,6 +29,9 @@
 					<a class="dropdown-item" th:href="@{/subject}">Предметы</a>
 				</div>
 			</li>
+			<li class="nav-item" th:if="${session.notAcceptedApps == null ? false : (session.notAcceptedApps.isEmpty() ? false : true)}" sec:authorize="hasAuthority('ADMIN')">
+				<a class="nav-link" th:href="@{/application/notAcceptedApps}"><b>Новые заявки</b></a>
+			</li>
 			<li class="nav-item" th:if="${session.user?.applicant}" sec:authorize="hasAuthority('USER')">
 				<a class="nav-link" th:href="@{/application}">
 					[[${session.specialities == null ? 'Подать заявку' : (#lists.size(session.specialities) < 5 ? 'Подать заявку' : 'Заявки')}]]

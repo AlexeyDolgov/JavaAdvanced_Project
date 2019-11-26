@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import ua.lviv.lgs.admissionsOffice.domain.AccessLevel;
 import ua.lviv.lgs.admissionsOffice.domain.Application;
+import ua.lviv.lgs.admissionsOffice.domain.RatingList;
 import ua.lviv.lgs.admissionsOffice.domain.User;
 import ua.lviv.lgs.admissionsOffice.service.ApplicationService;
 import ua.lviv.lgs.admissionsOffice.service.RatingListService;
@@ -29,7 +31,6 @@ import ua.lviv.lgs.admissionsOffice.service.SupportingDocumentService;
 
 @Controller
 @RequestMapping("/application")
-@PreAuthorize("hasAuthority('USER')")
 public class ApplicationController {
 	@Autowired
 	private ApplicationService applicationService;
@@ -40,6 +41,7 @@ public class ApplicationController {
 	@Autowired
 	private RatingListService ratingListService;
 	
+	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping
 	public String viewApplicationList(HttpServletRequest request, HttpSession session, Model model) {
 		User user = (User) request.getSession().getAttribute("user");
@@ -50,6 +52,7 @@ public class ApplicationController {
 		return "applicationList";
 	}
 	
+	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/create")
 	public String viewCreationForm(Model model) {
 		model.addAttribute("specialities", specialityService.findAll());
@@ -57,6 +60,7 @@ public class ApplicationController {
 		return "applicationCreator";
 	}
 	
+	@PreAuthorize("hasAuthority('USER')")
 	@PostMapping("/create")
 	public String createApplication(@RequestParam Map<String, String> form,	@RequestParam("files") MultipartFile[] supportingDocuments,
 			@Valid Application application, BindingResult bindingResult, Model model) throws IOException {
@@ -98,7 +102,7 @@ public class ApplicationController {
 
 	@PostMapping("/edit")
 	public String updateApplication(@RequestParam("id") Application application, @RequestParam Map<String, String> form,
-			@RequestParam("files") MultipartFile[] supportingDocuments, @Valid Application updatedApplication,
+			@RequestParam("files") MultipartFile[] supportingDocuments, HttpSession session, @Valid Application updatedApplication,
 			BindingResult bindingResult, Model model) throws IOException {
 		Map<String, String> znoMarksErrors = applicationService.getZnoMarksErrors(form);
 		Map<String, String> supportingDocumentErrors = supportingDocumentService.getSupportingDocumentErrors(supportingDocuments);
@@ -117,13 +121,32 @@ public class ApplicationController {
 		
 		applicationService.updateApplication(updatedApplication, form, supportingDocuments);
 
+		if (((User) session.getAttribute("user")).getAccessLevels().contains(AccessLevel.valueOf("ADMIN"))) {
+			return "redirect:/application/notAcceptedApps";
+		}
+		
 		return "redirect:/application";
 	}
 	
+	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/delete")
 	public String deleteApplication(@RequestParam("id") Application application) {
 		applicationService.deleteApplication(application);
 
 		return "redirect:/application";
 	}
+	
+	@PreAuthorize("hasAuthority('ADMIN')")
+	@GetMapping("/notAcceptedApps")
+	public String viewNotAcceptedApps(HttpSession session) {
+		List<RatingList> notAcceptedApps = ratingListService.findNotAcceptedApps();
+		
+		session.setAttribute("notAcceptedApps", notAcceptedApps);
+		
+		if (notAcceptedApps.isEmpty()) {
+			return "redirect:/main";
+		}
+		
+		return "notAcceptedApps";
+	}	
 }
