@@ -15,6 +15,7 @@ public interface RatingListRepository extends JpaRepository<RatingList, Integer>
 								"ON rl.application_application_id = app.application_id " +
 							"INNER JOIN speciality AS s " +
 								"ON app.speciality_id = s.speciality_id " +
+							"WHERE rl.accepted IS TRUE " +
 							"GROUP BY s.speciality_id", nativeQuery = true)
 	List<Object[]> countApplicationsBySpeciality();
 	
@@ -24,7 +25,7 @@ public interface RatingListRepository extends JpaRepository<RatingList, Integer>
 								"ON rl.application_application_id = app.application_id " +
 							"INNER JOIN applicant AS a " +
 								"ON app.applicant_id = a.user_user_id " +    
-							"WHERE app.speciality_id = ?1 " +
+							"WHERE rl.accepted IS TRUE AND app.speciality_id = ?1 " +
 							"ORDER BY rl.total_mark DESC", nativeQuery = true)
 	List<Object[]> getApplicantsRankBySpeciality(Integer specialityId);
 	
@@ -34,7 +35,7 @@ public interface RatingListRepository extends JpaRepository<RatingList, Integer>
 								"ON rl.application_application_id = app.application_id " +
 							"INNER JOIN speciality AS s " +
 								"ON app.speciality_id = s.speciality_id " +
-							"WHERE app.applicant_id = ?1", nativeQuery = true)
+							"WHERE rl.accepted IS TRUE AND app.applicant_id = ?1", nativeQuery = true)
 	List<Integer> findSpecialitiesByApplicant(Integer applicantId);
 
 	List<RatingList> findByAcceptedFalseAndRejectionMessageIsNull();

@@ -89,8 +89,8 @@ public class ApplicationService {
 						znoMarksErrors.put(key + "Error", "Баллы по предмету " + subject.getTitle()	+ " должны быть числом!");
 					}
 					if (!form.get(key).isEmpty() && form.get(key).matches("\\d+")) {
-						if (Integer.valueOf(form.get(key)) <= 0) {
-							znoMarksErrors.put(key + "Error", "Баллы по предмету " + subject.getTitle()	+ " не могут быть равны нулю!");
+						if (Integer.valueOf(form.get(key)) < 100) {
+							znoMarksErrors.put(key + "Error", "Баллы по предмету " + subject.getTitle()	+ " не могут быть меньше 100!");
 						}
 						if (Integer.valueOf(form.get(key)) > 200) {
 							znoMarksErrors.put(key + "Error", "Баллы по предмету " + subject.getTitle()	+ " не могут быть больше 200!");
@@ -120,5 +120,31 @@ public class ApplicationService {
 
 	public void deleteApplication(Application application) {
 		applicationRepository.delete(application);		
+	}
+
+	public Map<Integer, String> getApplicationsStatus(List<Application> applicationsList) {
+		Map<Integer, String> applicationsStatus = new HashMap<>();
+		for (Application application : applicationsList) {
+			if (!application.getRatingList().isAccepted() && application.getRatingList().getRejectionMessage() == null) {
+				applicationsStatus.put(application.getId(), "Ожидает обработки");
+			} else if (!application.getRatingList().isAccepted() && application.getRatingList().getRejectionMessage() != null) {
+				applicationsStatus.put(application.getId(), "Отклонена");
+			} else if (application.getRatingList().isAccepted()) {
+				applicationsStatus.put(application.getId(), "Принята");
+			}			
+		}
+		return applicationsStatus;
+	}
+	
+	public boolean checkForRejectedApplications(List<Application> applicationsList) {
+		boolean isRejectedApplicationPresent = false;
+		
+		for (Application application : applicationsList) {
+			if (application.getRatingList().getRejectionMessage() != null) {
+				isRejectedApplicationPresent = true;
+				break;
+			}
+		}
+		return isRejectedApplicationPresent;	
 	}
 }

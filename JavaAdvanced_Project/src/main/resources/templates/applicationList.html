@@ -15,8 +15,8 @@
 				<tr>
 					<th scope="col"></th>
 					<th scope="col">Специальность</th>
-					<th scope="col">Баллы по ВНО</th>
-					<th scope="col">Средний балл аттестата</th>
+					<th scope="col">Баллы по предметам</th>
+					<th scope="col">Статус заявки</th>
 					<th scope="col"></th>
 				</tr>
 			</thead>
@@ -25,16 +25,17 @@
 					<th th:text="${iterStat.count}"/>
 					<td th:text="${aplication.speciality.title}"/>
 					<td>
-						<div th:each="znoMark, iterStat: ${aplication.znoMarks}"
-							th:text="${!iterStat.last} ? |${znoMark.key.title}: ${znoMark.value} бал.| + ', ' : |${znoMark.key.title}: ${znoMark.value} бал.|">
+						<div th:each="znoMark : ${aplication.znoMarks}"
+							th:text="|${znoMark.key.title}: ${znoMark.value} бал.,|">
 						</div>
+						<div th:text="|Ср. балл аттестата: ${aplication.attMark} бал.|"></div>
 					</td>
-					<td th:text="${aplication.attMark} + ' бал.'"/>
+					<td th:each="status : ${applicationsStatus}" th:if="${status.key.equals(aplication.id)}" th:text="${status.value}"/>
 					<td>
-						<a th:href="@{'/application/edit?id=' + ${aplication.id}}">ред.</a>
-						<span th:if="true">  
-							<a th:href="@{'/application/delete?id=' + ${aplication.id}}">удал.</a>
+						<span th:unless="${aplication.ratingList.accepted}">
+							<a th:href="@{'/application/edit?id=' + ${aplication.id}}">ред.</a>  |  
 						</span>
+							<a th:href="@{'/application/delete?id=' + ${aplication.id}}">удал.</a>
 					</td>
 				</tr>
 			</tbody>

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import ua.lviv.lgs.admissionsOffice.domain.AccessLevel;
 import ua.lviv.lgs.admissionsOffice.domain.User;
+import ua.lviv.lgs.admissionsOffice.service.ApplicationService;
 import ua.lviv.lgs.admissionsOffice.service.RatingListService;
 import ua.lviv.lgs.admissionsOffice.service.UserService;
 
@@ -22,6 +23,8 @@ import ua.lviv.lgs.admissionsOffice.service.UserService;
 public class MainController {
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private ApplicationService applicationService;
 	@Autowired
 	private RatingListService ratingListService;
 		
@@ -37,6 +40,7 @@ public class MainController {
 			session.setAttribute("photo", userService.parseFileData(userFromDb));
 			session.setAttribute("specialities", ratingListService.findSpecialitiesByApplicant(userFromDb.getId()));
 			model.addAttribute("submittedApps", ratingListService.parseApplicationsBySpeciality());
+			model.addAttribute("isRejectedAppsPresent", applicationService.checkForRejectedApplications(applicationService.findByApplicant(userFromDb.getApplicant())));
 		}
 		
 		if (userFromDb.getAccessLevels().contains(AccessLevel.valueOf("ADMIN"))) {

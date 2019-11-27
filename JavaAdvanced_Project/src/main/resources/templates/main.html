@@ -17,6 +17,9 @@
 			<p th:if="${session.user?.applicant} AND ${#lists.size(session.specialities) < 5}" class="lead">
 				Теперь можно <a th:href="@{/application}">подать заявку</a> на участие во вступительном конкурсе на одну из специальностей.
 			</p>
+			<p th:if="${isRejectedAppsPresent}" class="lead">
+				Некоторые поданные ранее заявки были отклонены. Проверьте их статусы <a th:href="@{/application}">здесь</a> и исправьте выявленные недочеты.
+			</p>
 			<div th:if="${!session.specialities.isEmpty()}">
 				<p class="lead">
 					Ниже можно ознакомиться с рейтингом абитуриентов по выбранным специальностям.
@@ -30,6 +33,9 @@
 								<p class="card-text"><b>План набора: </b>[[${speciality.enrollmentPlan}]]</p>
 								<p class="card-text" th:each="submittedApp : ${submittedApps}" th:if="${submittedApp.key.equals(speciality)}">
 									<b>Подано документов: </b>[[${submittedApp.value}]]
+								</p>
+								<p class="card-text" th:each="submittedApp : ${submittedApps}" th:if="${submittedApp.key.equals(speciality)}">
+									<b>Общий конкурс: </b>[[${#numbers.formatDecimal(#conversions.convert(submittedApp.value, 'Double') / speciality.enrollmentPlan, 1, 2)}]]
 								</p>
 								<a th:href="@{'/ratingList/speciality?id=' + ${speciality.id}}" class="card-link">Рейтинг-лист</a>						
 							</div>

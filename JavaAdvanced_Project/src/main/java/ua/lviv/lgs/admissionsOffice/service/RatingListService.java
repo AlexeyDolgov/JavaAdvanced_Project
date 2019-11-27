@@ -32,6 +32,8 @@ public class RatingListService {
 	private SpecialityRepository specialityRepository;
 	@Autowired
 	private ApplicantRepository applicantRepository;
+	@Autowired
+	private MailSender mailSender;
 	
 	public Optional<RatingList> findById(Integer id) {
 		return ratingListRepository.findById(id);
@@ -49,6 +51,7 @@ public class RatingListService {
 		for (String key : form.keySet()) {
 			if (key.equals("rejectionMessage") && !form.get(key).isEmpty()) {
 				ratingList.setRejectionMessage(form.get(key));
+				sendRejectionEmail(application, form.get(key));
 			} else {
 				ratingList.setRejectionMessage(null);
 			}
@@ -58,12 +61,40 @@ public class RatingListService {
 			if (key.equals("accept")) {
 				ratingList.setAccepted(true);
 				ratingList.setRejectionMessage(null);
+				sendAcceptionEmail(application);
 			}
 		}
 
 		ratingList.setApplication(application);
 		
 		return ratingList;
+	}
+	
+	public void sendAcceptionEmail(Application application) {
+		String message = String.format(
+				"Доброго времени суток, %s %s! \n\n" +
+						"Ваша вступительная заявка на специальность \"%s\" принята администратором.\n" +
+						"Результаты конкурсного отбора по выбранной специальности вы можете отслеживать в своем личном кабинете.",
+					application.getApplicant().getUser().getFirstName(),
+					application.getApplicant().getUser().getLastName(),
+					application.getSpeciality().getTitle()					
+				);
+
+		mailSender.send(application.getApplicant().getUser().getEmail(), "Вступительная заявка на специальность \"" + application.getSpeciality().getTitle() + "\" принята", message);        
+	}
+	
+	public void sendRejectionEmail(Application application, String rejectionMessage) {
+		String message = String.format(
+				"Доброго времени суток, %s %s! \n\n" +
+						"Ваша вступительная заявка на специальность \"%s\" отклонена администратором по следующей причине: \"%s\".\n" +
+						"Для участия в конкурсном отборе по выбранной специальности исправьте, пожалуйста, выявленные недочеты в заявке в своем личном кабинете.",
+					application.getApplicant().getUser().getFirstName(),
+					application.getApplicant().getUser().getLastName(),
+					application.getSpeciality().getTitle(),
+					rejectionMessage					
+				);
+
+		mailSender.send(application.getApplicant().getUser().getEmail(), "Вступительная заявка на специальность \"" + application.getSpeciality().getTitle() + "\" отклонена", message);        
 	}
 
 	public Double calculateTotalMark(Map<Subject, Integer> znoMarks, Integer attMark) {

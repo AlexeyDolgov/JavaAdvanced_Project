@@ -48,7 +48,7 @@ public class Application implements Serializable {
 
 	@Column
 	@NotNull(message = "Средний балл аттестата не может быть пустым!")
-	@Min(value = 1, message = "Средний балл аттестата не может быть равен нулю!")
+	@Min(value = 100, message = "Средний балл аттестата не может быть меньше 100!")
 	@Max(value = 200, message = "Средний балл аттестата не может быть больше 200!")
 	private Integer attMark;
 

@@ -47,6 +47,7 @@ public class ApplicationController {
 		User user = (User) request.getSession().getAttribute("user");
 		List<Application> applicationsList = applicationService.findByApplicant(user.getApplicant());
 		model.addAttribute("applications", applicationsList);
+		model.addAttribute("applicationsStatus", applicationService.getApplicationsStatus(applicationsList));
 		session.setAttribute("specialities", ratingListService.findSpecialitiesByApplicant(user.getId()));
 		
 		return "applicationList";
