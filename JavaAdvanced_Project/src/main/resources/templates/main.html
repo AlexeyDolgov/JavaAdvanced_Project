@@ -28,6 +28,13 @@
 					<div th:each="speciality : ${session.specialities}">
 						<div class="card mx-2 my-2" style="width: 18rem">
 							<div class="card-body">
+								<span th:if="${speciality.recruitmentCompleted == true}" class="badge badge-pill badge-success">Набор завершен!</span>
+								<span th:each="entry : ${enrolledApplicants}"
+									th:if="${speciality.recruitmentCompleted == true} AND ${entry.key.equals(speciality)} AND ${entry.value.contains(session.user?.applicant)}"
+									class="badge badge-pill badge-success">Вы приняты!</span>
+								<span th:each="entry : ${enrolledApplicants}"
+									th:if="${speciality.recruitmentCompleted == true} AND ${entry.key.equals(speciality)} AND ${!entry.value.contains(session.user?.applicant)}"
+									class="badge badge-pill badge-danger">Вы не приняты!</span>
 								<h5 class="card-title">[[${speciality.title}]]</h5>
 								<h6 class="card-subtitle mb-4 text-muted">[[${speciality.faculty.title}]] факультет</h6>
 								<p class="card-text"><b>План набора: </b>[[${speciality.enrollmentPlan}]]</p>

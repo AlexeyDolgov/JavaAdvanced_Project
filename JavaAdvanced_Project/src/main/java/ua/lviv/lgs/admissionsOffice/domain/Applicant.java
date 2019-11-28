@@ -9,10 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
 import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -43,11 +40,7 @@ public class Applicant implements Serializable, Comparable<Applicant> {
 	@OneToOne
     @MapsId
     private User user;
-	
-	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "speciality_applicant", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "speciality_id"))
-	private Set<Speciality> applicantSpecialities;
-	
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "applicant")
 	@Column(nullable = false)
 	private Set<Application> applications;
@@ -123,14 +116,6 @@ public class Applicant implements Serializable, Comparable<Applicant> {
 
 	public void setUser(User user) {
 		this.user = user;
-	}
-
-	public Set<Speciality> getApplicantSpecialities() {
-		return applicantSpecialities;
-	}
-
-	public void setApplicantSpecialities(Set<Speciality> applicantSpecialities) {
-		this.applicantSpecialities = applicantSpecialities;
 	}
 
 	public Set<Application> getApplications() {

@@ -4,8 +4,10 @@ import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -167,5 +169,40 @@ public class RatingListService {
 
 	public List<RatingList> findNotAcceptedApps() {
 		return ratingListRepository.findByAcceptedFalseAndRejectionMessageIsNull();
+	}
+
+	public void completeRecruitmentBySpeciality(Speciality speciality) {
+		Set<Applicant> enrolledApplicants = getEnrolledApplicantsBySpeciality(speciality);
+		enrolledApplicants.stream().forEach(applicant -> sendEnrolledEmail(applicant, speciality));
+//		enrolledApplicants.stream().forEach(applicant -> System.out.println(applicant.getUser().getFirstName() + " " + applicant.getUser().getLastName() + ", Вы приняты!"));
+	}
+
+	public Set<Applicant> getEnrolledApplicantsBySpeciality(Speciality speciality) {
+		Map<Applicant, Double> applicantsRank = parseApplicantsRankBySpeciality(speciality.getId());
+		Set<Applicant> enrolledApplicants = new LinkedHashSet<>();
+		Integer i = 1;
+		
+		if (speciality.isRecruitmentCompleted()) {
+			for (Entry<Applicant, Double> entry : applicantsRank.entrySet()) {
+				if (i <= speciality.getEnrollmentPlan()) {
+					enrolledApplicants.add(entry.getKey());
+					i++;
+				}
+			}
+		}
+		return enrolledApplicants;
+	}
+
+	public void sendEnrolledEmail(Applicant applicant, Speciality speciality) {
+		String message = String.format(
+				"Доброго времени суток, %s %s! \n\n" +
+						"Поздравляем! По итогам конкурсного отбора на специальность \"%s\" Вы оказались в числе абитуриентов, рекомедованных к зачислению.\n" +
+						"Пожалуйста, в течении 10 дней подайте оригиналы документов в Приёмную комиссию.",
+					applicant.getUser().getFirstName(),
+					applicant.getUser().getLastName(),
+					speciality.getTitle()									
+				);
+
+		mailSender.send(applicant.getUser().getEmail(), "Набор на специальность \"" + speciality.getTitle() + "\" завершен", message);        
 	}
 }

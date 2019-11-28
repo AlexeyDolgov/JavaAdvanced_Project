@@ -18,11 +18,17 @@ public class SpecialityService {
 	private SpecialityRepository specialityRepository;
 	@Autowired
 	private FacultyRepository facultyRepository;
+	@Autowired
+	private RatingListService ratingListService;
 
 	public List<Speciality> findAll() {
 		return specialityRepository.findAll();
 	}
 
+	public List<Speciality> findByRecruitmentCompletedFalse() {
+		return specialityRepository.findByRecruitmentCompletedFalse();
+	}
+	
 	public boolean createSpeciality(Speciality speciality, Map<String, String> form) {
 		Optional<Speciality> specialityFromDb = specialityRepository.findByTitle(speciality.getTitle());
 		
@@ -32,6 +38,7 @@ public class SpecialityService {
 
 		Faculty faculty = parseFaculty(form);
 		speciality.setFaculty(faculty);
+		speciality.setRecruitmentCompleted(false);
 
 		specialityRepository.save(speciality);
 		return true;
@@ -40,6 +47,7 @@ public class SpecialityService {
 	public void updateSpeciality(Speciality speciality, Map<String, String> form) {
 		Faculty faculty = parseFaculty(form);
 		speciality.setFaculty(faculty);
+		speciality.setRecruitmentCompleted(false);
 		
 		specialityRepository.save(speciality);
 	}
@@ -48,6 +56,13 @@ public class SpecialityService {
 		specialityRepository.delete(speciality);
 	}
 
+	public void completeRecruitment(Speciality speciality) {
+		speciality.setRecruitmentCompleted(true);
+		specialityRepository.save(speciality);
+
+		ratingListService.completeRecruitmentBySpeciality(speciality);
+	}
+	
 	public Faculty parseFaculty(Map<String, String> form) {
 		Integer facultyId = Integer.valueOf(form.get("faculty"));
 		Faculty faculty = facultyRepository.findById(facultyId).get();

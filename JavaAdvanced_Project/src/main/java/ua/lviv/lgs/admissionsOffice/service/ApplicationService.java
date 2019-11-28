@@ -140,7 +140,7 @@ public class ApplicationService {
 		boolean isRejectedApplicationPresent = false;
 		
 		for (Application application : applicationsList) {
-			if (application.getRatingList().getRejectionMessage() != null) {
+			if (application != null && application.getRatingList().getRejectionMessage() != null) {
 				isRejectedApplicationPresent = true;
 				break;
 			}

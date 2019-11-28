@@ -102,4 +102,12 @@ public class SpecialityController {
 
 		return "redirect:/speciality";
 	}
+	
+	@GetMapping("/complete")
+	public String completeRecruitment(@RequestParam("id") Speciality speciality) {
+		specialityService.completeRecruitment(speciality);
+
+		return "redirect:/speciality";
+	}
+
 }

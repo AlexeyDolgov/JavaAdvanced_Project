@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -35,14 +34,13 @@ public class Speciality implements Serializable {
 	@NotNull(message = "План набора не может быть пустым!")
 	@Min(value = 1, message = "План набора не может быть равен нулю!")
 	private Integer enrollmentPlan;
+	@Column
+	private boolean recruitmentCompleted;
 
 	@ManyToOne
 	@JoinColumn(name = "faculty_id", nullable = false)
 	private Faculty faculty;
 
-	@ManyToMany(mappedBy = "applicantSpecialities")
-	private Set<Applicant> applicants;
-	
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "speciality")
 	@Column(nullable = false)
 	private Set<Application> applications;
@@ -79,6 +77,14 @@ public class Speciality implements Serializable {
 		this.enrollmentPlan = enrollmentPlan;
 	}
 
+	public boolean isRecruitmentCompleted() {
+		return recruitmentCompleted;
+	}
+
+	public void setRecruitmentCompleted(boolean recruitmentCompleted) {
+		this.recruitmentCompleted = recruitmentCompleted;
+	}
+
 	public Faculty getFaculty() {
 		return faculty;
 	}
@@ -87,14 +93,6 @@ public class Speciality implements Serializable {
 		this.faculty = faculty;
 	}
 
-	public Set<Applicant> getApplicants() {
-		return applicants;
-	}
-
-	public void setApplicants(Set<Applicant> applicants) {
-		this.applicants = applicants;
-	}
-	
 	public Set<Application> getApplications() {
 		return applications;
 	}

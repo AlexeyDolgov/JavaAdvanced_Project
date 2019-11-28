@@ -30,10 +30,18 @@
 							<span th:case="*"><a th:href="@{'/ratingList/speciality?id=' + ${speciality.id}}">[[${submittedApp.value}]]</a></span>
 						</span>
 					<td>
-						<a th:href="@{'/speciality/edit?id=' + ${speciality.id}}">ред.</a>
-						<span th:if="${speciality.applicants.isEmpty() AND speciality.applications.isEmpty()}">  |  
-							<a th:href="@{'/speciality/delete?id=' + ${speciality.id}}">удал.</a>
-						</span>
+						<div th:if="${speciality.recruitmentCompleted == false}">
+							<a th:href="@{'/speciality/edit?id=' + ${speciality.id}}">ред.</a>
+							<span th:if="${speciality.applications.isEmpty()}">  |  
+								<a th:href="@{'/speciality/delete?id=' + ${speciality.id}}">удал.</a>
+							</span>
+							<div th:each="submittedApp : ${submittedApps}" th:if="${submittedApp.key.equals(speciality) AND submittedApp.value != 0}">
+								<a class="badge badge-pill badge-danger" th:href="@{'/speciality/complete?id=' + ${speciality.id}}">завершить набор</a>
+							</div>
+						</div>
+						<div th:if="${speciality.recruitmentCompleted == true}">
+							<span class="badge badge-pill badge-success">Набор завершен!</span>
+						</div>
 					</td>
 				</tr>
 			</tbody>

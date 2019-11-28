@@ -13,6 +13,7 @@
 					<th scope="col">Имя</th>
 					<th scope="col">Фамилия</th>
 					<th scope="col">Рейтинговый балл</th>
+					<th th:if="${speciality.recruitmentCompleted == true}" scope="col">Статус</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -21,6 +22,11 @@
 					<td th:class="${session.user.id == entry.key.user.id}?'table-success'" th:text="${entry.key.user.firstName}"/>
 					<td th:class="${session.user.id == entry.key.user.id}?'table-success'" th:text="${entry.key.user.lastName}"/>
 					<td th:class="${session.user.id == entry.key.user.id}?'table-success'" th:text="${#numbers.formatDecimal(entry.value, 3, 2)}"/>
+					<td th:class="${session.user.id == entry.key.user.id}?'table-success'" th:if="${speciality.recruitmentCompleted == true}">
+						<div th:each="enrolledApplicant : ${enrolledApplicants}" th:if="${enrolledApplicant.id.equals(entry.key.id)}">
+							<span class="badge badge-pill badge-success">Принят</span>
+						</div>
+					</td>
 				</tr>
 			</tbody>
 		</table>

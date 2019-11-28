@@ -25,6 +25,7 @@ create table speciality (
 	title varchar(255) not null,
 	faculty_id integer not null,
 	enrollment_plan integer not null,
+	recruitment_completed bit,
 	primary key (speciality_id)
 ) engine=MyISAM;
 
@@ -49,12 +50,6 @@ create table applicant (
 	file_type varchar(255),
 	file_data longblob,
 	primary key (user_user_id)
-) engine=MyISAM;
-
-create table speciality_applicant (
-	user_id integer not null,
-	speciality_id integer not null,
-	primary key (user_id, speciality_id)
 ) engine=MyISAM;
 
 create table application (
@@ -109,14 +104,6 @@ alter table applicant
 	add constraint applicant__user__fk
 	foreign key (user_user_id) references user (user_id);
 	
-alter table speciality_applicant
-	add constraint speciality_applicant__speciality__fk
-	foreign key (speciality_id) references speciality (speciality_id);
-
-alter table speciality_applicant
-	add constraint speciality_applicant__applicant__fk
-	foreign key (user_id) references applicant (user_user_id);
-
 alter table application
 	add constraint application__applicant__fk
 	foreign key (applicant_id) references applicant (user_user_id);

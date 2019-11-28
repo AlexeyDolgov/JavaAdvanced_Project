@@ -30,12 +30,18 @@
 						</div>
 						<div th:text="|Ср. балл аттестата: ${aplication.attMark} бал.|"></div>
 					</td>
-					<td th:each="status : ${applicationsStatus}" th:if="${status.key.equals(aplication.id)}" th:text="${status.value}"/>
+					<td th:each="status : ${applicationsStatus}" th:if="${status.key.equals(aplication.id)}" th:switch="${status.value}">
+						<span th:case="'Ожидает обработки'" class="badge badge-pill badge-warning">Ожидает обработки</span>
+						<span th:case="'Отклонена'" class="badge badge-pill badge-danger">Отклонена</span>
+						<span th:case="'Принята'" class="badge badge-pill badge-success">Принята</span>
+					</td>
 					<td>
 						<span th:unless="${aplication.ratingList.accepted}">
 							<a th:href="@{'/application/edit?id=' + ${aplication.id}}">ред.</a>  |  
 						</span>
+						<span th:unless="${aplication.speciality.recruitmentCompleted}">
 							<a th:href="@{'/application/delete?id=' + ${aplication.id}}">удал.</a>
+						</span>
 					</td>
 				</tr>
 			</tbody>

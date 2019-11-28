@@ -56,7 +56,7 @@ public class ApplicationController {
 	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/create")
 	public String viewCreationForm(Model model) {
-		model.addAttribute("specialities", specialityService.findAll());
+		model.addAttribute("specialities", specialityService.findByRecruitmentCompletedFalse());
 		
 		return "applicationCreator";
 	}
@@ -75,7 +75,7 @@ public class ApplicationController {
             model.addAttribute(!znoMarksErrors.isEmpty() ? "message" : "", "При заполнении баллов по ВНО были обнаружены ошибки: " +
             		znoMarksErrors.values() + ". Попробуйте заполнить форму еще раз!");
             model.addAttribute(form.get("speciality") == "" ? "specialityError" : "", "Поле Специальность не может быть пустым!");
-    		model.addAttribute("specialities", specialityService.findAll());
+    		model.addAttribute("specialities", specialityService.findByRecruitmentCompletedFalse());
     		
             return "applicationCreator";
         }
@@ -84,7 +84,7 @@ public class ApplicationController {
 
 		if (applicationExists) {
 			model.addAttribute("message", "На выбранную специальность заявка уже существует!");
-			model.addAttribute("specialities", specialityService.findAll());
+			model.addAttribute("specialities", specialityService.findByRecruitmentCompletedFalse());
 
 			return "applicationCreator";
 		}
@@ -95,7 +95,7 @@ public class ApplicationController {
 	@GetMapping("/edit")
 	public String viewEditForm(@RequestParam("id") Application application, Model model) {
 		model.addAttribute("aplication", application);
-		model.addAttribute("specialities", specialityService.findAll());
+		model.addAttribute("specialities", specialityService.findByRecruitmentCompletedFalse());
 		model.addAttribute("downloadURI", ServletUriComponentsBuilder.fromCurrentContextPath().path("/downloadFile/").toUriString());
 		
 		return "applicationEditor";
@@ -114,7 +114,7 @@ public class ApplicationController {
 			model.mergeAttributes(znoMarksErrors);
 			model.mergeAttributes(supportingDocumentErrors);
 			model.addAttribute("aplication", application);
-			model.addAttribute("specialities", specialityService.findAll());
+			model.addAttribute("specialities", specialityService.findByRecruitmentCompletedFalse());
 			model.addAttribute("downloadURI", ServletUriComponentsBuilder.fromCurrentContextPath().path("/downloadFile/").toUriString());
 			
 			return "applicationEditor";
