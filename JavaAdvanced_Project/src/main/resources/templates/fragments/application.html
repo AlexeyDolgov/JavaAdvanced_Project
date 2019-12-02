@@ -74,10 +74,7 @@
 				<div class="custom-file">
 					<input th:class="${supportingDocumentError}?'custom-file-input is-invalid':'custom-file-input'"
 						type="file" id="files" name="files" multiple sec:authorize="hasAuthority('USER')"
-						onchange="$(this).next('.custom-file-label').addClass('selected').html(
-							$(this)[0].files.length == 0 ? 'Выберите файлы...' :
-								( $(this)[0].files.length == 1 ? $(this).val().split('\\').pop() : 
-									'Число файлов: ' + $(this)[0].files.length ) )" />
+						onchange="handleFileMultipartInputPlaceholder()" />
 					<label for="customFile" class="custom-file-label text-muted text-truncate" sec:authorize="hasAuthority('USER')">[[#{aplication.supporting_documents_placeholder}]]</label>
 					<div th:if="${supportingDocumentError}" class="invalid-feedback" th:text="${supportingDocumentError}"></div>
 					<small class="form-text text-muted" id="filesList"></small>
@@ -105,7 +102,12 @@
 		</div>
 		<button class="btn btn-primary my-3" type="submit">[[${isEditForm}?#{aplication.save}:#{aplication.create}]]</button>
 	</form>
-	<script>
+	<script src="../messageResource.js"></script>
+	<script>	
+	messageResource.init({ filePath: '../' });
+	var currentLocale = localStorage.getItem('locales');
+	messageResource.load('message', function() {}, currentLocale);
+		
 	function viewSubjectsBySpeciality() {
 		var speciality = $("select[name='speciality']").val();
 		var subjects = null;
@@ -117,7 +119,7 @@
 				}
 			}).done(
 				function() {
-					var formContent = '<h5>Баллы по ВНО:</h5>';
+					var formContent = '<h5>' + messageResource.get('aplication.zno_marks', 'message', currentLocale) + ':</h5>';
 					jQuery.each(subjects, function(i, value) {
 						formContent +=
 							"<div class='form-group row'>"
@@ -136,12 +138,22 @@
 		}
 	}
 	
+	function handleFileMultipartInputPlaceholder() {
+		var filesInput = $("input[name='files']");
+		
+		filesInput.next('.custom-file-label').addClass('selected').html(
+			filesInput[0].files.length == 0 ? messageResource.get('aplication.supporting_documents_placeholder', 'message', currentLocale) :
+				( filesInput[0].files.length == 1 ? filesInput.val().split('\\').pop() : 
+					messageResource.get('aplication.supporting_documents_files_uploaded', 'message', currentLocale) + ': ' + filesInput[0].files.length ) )
+	}
+	
 	function handleFileSelect(event) {
 		var files = event.target.files;
 
 		var output = [];
 		for (var i = 0, file; file = files[i]; i++) {
-			output.push('<li><strong>', file.name, '</strong> (', file.type || 'n/a', ') - ', file.size, ' bytes</li>');
+			output.push('<li><strong>', file.name, '</strong> (', file.type || 'n/a', ') - ', file.size, ' ',
+					messageResource.get('aplication.supporting_documents_bytes', 'message', currentLocale), '</li>');
 		}
 
 		document.getElementById('filesList').innerHTML = '<ul>' + output.join('') + '</ul>';
