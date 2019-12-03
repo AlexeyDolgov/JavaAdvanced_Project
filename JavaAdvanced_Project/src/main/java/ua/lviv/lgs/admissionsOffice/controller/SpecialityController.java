@@ -62,7 +62,7 @@ public class SpecialityController {
 		boolean specialityExists = !specialityService.createSpeciality(speciality, form);
 		
 		if (specialityExists) {
-			model.addAttribute("message", "Такая специальность уже существует!");
+			model.addAttribute("specialityExistsMessage", "Такая специальность уже существует!");
 			model.addAttribute("faculties", facultyService.findAll());
 			
 			return "specialityCreator";

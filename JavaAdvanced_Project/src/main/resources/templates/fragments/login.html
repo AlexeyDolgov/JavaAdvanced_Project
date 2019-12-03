@@ -4,8 +4,17 @@
 
 <main th:fragment="commonLogin(title, path, isLoginForm)">
     <h3>[[${title}]]</h3>
-	<div th:if="${message}" th:class="|alert alert-${messageType}|" role="alert">
-		[[${message}]]
+	<div th:if="${userExistsMessage}" class="alert alert-danger" role="alert">
+		[[#{userExistsMessage}]]
+	</div>
+	<div th:if="${activationMessage}" class="alert alert-success" role="alert">
+		[[#{activationMessage}]]
+	</div>
+	<div th:if="${activationSucceedMessage}" class="alert alert-success" role="alert">
+		[[#{activationSucceedMessage}]]
+	</div>
+	<div th:if="${activationFailedMessage}" class="alert alert-danger" role="alert">
+		[[#{activationFailedMessage}]]
 	</div>
 	<div th:if="${param.error}" class="alert alert-danger" role="alert">
       	[[#{login.error_message}]]!
@@ -20,7 +29,7 @@
         	<div class="col-sm-6">
         		<input th:class="${firstNameError}?'form-control is-invalid':'form-control'"
 					type="text" name="firstName" th:value="${user}?${user.firstName}" th:placeholder="#{registration.first_name}"/>
-        		<div th:if="${firstNameError}" class="invalid-feedback" th:text="${firstNameError}"></div>
+        		<div th:if="${firstNameError}" class="invalid-feedback" th:text="#{firstNameError}"></div>
         	</div>
         </div>
         <div class="form-group row" th:if="${!isLoginForm}">
@@ -28,7 +37,7 @@
         	<div class="col-sm-6">
         		<input th:class="${lastNameError}?'form-control is-invalid':'form-control'"
 					type="text" name="lastName" th:value="${user}?${user.lastName}" th:placeholder="#{registration.last_name}"/>
-        		<div th:if="${lastNameError}" class="invalid-feedback" th:text="${lastNameError}"></div>
+        		<div th:if="${lastNameError}" class="invalid-feedback" th:text="#{lastNameError}"></div>
         	</div>
         </div>
         <div class="form-group row">
@@ -36,7 +45,7 @@
         	<div class="col-sm-6">
         		<input th:class="${emailError}?'form-control is-invalid':'form-control'"
 					type="text" th:name="${isLoginForm}?username:email" th:value="${user}?${user.email}" th:placeholder="#{login.email}"/>
-        		<div th:if="${emailError}" class="invalid-feedback" th:text="${emailError}"></div>
+        		<div th:if="${emailError}" class="invalid-feedback" th:text="#{emailError}"></div>
         	</div>
         </div>        
         <div class="form-group row">
@@ -44,15 +53,16 @@
         	<div class="col-sm-6">
         		<input th:class="${passwordError}?'form-control is-invalid':'form-control'"
 					type="password" name="password" th:placeholder="#{login.password}"/>
-        		<div th:if="${passwordError}" class="invalid-feedback" th:text="${passwordError}"></div>
+        		<div th:if="${passwordError}" class="invalid-feedback" th:text="#{passwordError}"></div>
         	</div>
         </div>
         <div class="form-group row" th:if="${!isLoginForm}">
         	<label class="col-sm-2 col-form-label">[[#{registration.confirm_password}]]: </label>
         	<div class="col-sm-6">
-        		<input th:class="${confirmPasswordError}?'form-control is-invalid':'form-control'"
+        		<input th:class="${confirmPasswordError!=null || confirmPasswordError2!=null}?'form-control is-invalid':'form-control'"
 					type="password" name="confirmPassword" th:placeholder="#{registration.confirm_password}"/>
-        		<div th:if="${confirmPasswordError}" class="invalid-feedback" th:text="${confirmPasswordError}"></div>
+        		<div th:if="${confirmPasswordError}" class="invalid-feedback" th:text="#{confirmPasswordError}"></div>
+        		<div th:if="${confirmPasswordError2}" class="invalid-feedback" th:text="#{confirmPasswordError2}"></div>
         	</div>
         </div>
         <div class="form-check" th:if="${isLoginForm}">
@@ -61,7 +71,7 @@
         </div>			
         <div class="col-sm-6" th:if="${!isLoginForm}">
             <div class="g-recaptcha" data-sitekey="6LdnEL4UAAAAAM6h1YjSYgcOdN6BSAZBhU8pyM-m"></div>
-            <div th:if="${captchaError}" class="alert alert-danger" role="alert" style="width: 302px;" th:text="${captchaError}"></div>
+            <div th:if="${captchaError}" class="alert alert-danger" role="alert" style="width: 302px;" th:text="#{captchaError}"></div>
         </div>
         <button class="btn btn-primary mt-3" type="submit">[[${isLoginForm}?#{login.sign_in}:#{registration.sign_up}]]</button>
         <div><a th:if="${isLoginForm}" href="/registration">[[#{login.new_user}]]</a></div>

@@ -72,9 +72,9 @@ public class ApplicationController {
             Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
             model.mergeAttributes(errors);
             model.mergeAttributes(supportingDocumentErrors);
-            model.addAttribute(!znoMarksErrors.isEmpty() ? "message" : "", "При заполнении баллов по ВНО были обнаружены ошибки: " +
+            model.addAttribute(!znoMarksErrors.isEmpty() ? "znoMarksErrorMessage" : "", "При заполнении баллов по ВНО были обнаружены ошибки: " +
             		znoMarksErrors.values() + ". Попробуйте заполнить форму еще раз!");
-            model.addAttribute(form.get("speciality") == "" ? "specialityError" : "", "Поле Специальность не может быть пустым!");
+            model.addAttribute(form.get("speciality").isEmpty() ? "specialityError" : "", "Поле Специальность не может быть пустым!");
     		model.addAttribute("specialities", specialityService.findByRecruitmentCompletedFalse());
     		
             return "applicationCreator";
@@ -83,7 +83,7 @@ public class ApplicationController {
 		boolean applicationExists = !applicationService.createApplication(application, form, supportingDocuments);
 
 		if (applicationExists) {
-			model.addAttribute("message", "На выбранную специальность заявка уже существует!");
+			model.addAttribute("applicationExistsMessage", "На выбранную специальность заявка уже существует!");
 			model.addAttribute("specialities", specialityService.findByRecruitmentCompletedFalse());
 
 			return "applicationCreator";
