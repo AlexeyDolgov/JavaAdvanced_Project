@@ -24,7 +24,7 @@
 				<p class="lead">
 					[[#{main.user.message4}]].
 				</p>
-				<div class="row">
+				<div class="row" id="admittedSpecialities">
 					<div th:each="speciality : ${session.specialities}">
 						<div class="card mx-2 my-2" style="width: 18rem">
 							<div class="card-body">
@@ -57,7 +57,7 @@
 				<p class="lead">
 					[[#{main.admin.message1}]].
 				</p>
-				<div class="row">
+				<div class="row" id="notAcceptedApps">
 					<div th:each="app : ${session.notAcceptedApps}">
 						<div class="card mx-2 my-2" style="width: 18rem">
 							<div class="card-body">
