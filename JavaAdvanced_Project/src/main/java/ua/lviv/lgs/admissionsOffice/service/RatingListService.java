@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import ua.lviv.lgs.admissionsOffice.dao.ApplicantRepository;
@@ -201,10 +203,10 @@ public class RatingListService {
 				.collect(Collectors.toCollection(TreeSet::new));
 	}
 
-	public List<RatingList> findNotAcceptedApps() {
+	public Page<RatingList> findNotAcceptedApps(Pageable pageable) {
 		logger.trace("Getting all not accepted applications from database...");
 		
-		return ratingListRepository.findByAcceptedFalseAndRejectionMessageIsNull();
+		return ratingListRepository.findByAcceptedFalseAndRejectionMessageIsNull(pageable);
 	}
 
 	public void announceRecruitmentResultsBySpeciality(Speciality speciality) {

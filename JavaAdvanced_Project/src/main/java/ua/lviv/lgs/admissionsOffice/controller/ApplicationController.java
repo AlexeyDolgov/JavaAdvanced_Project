@@ -9,6 +9,10 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -139,8 +143,8 @@ public class ApplicationController {
 	
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@GetMapping("/notAcceptedApps")
-	public String viewNotAcceptedApps(HttpSession session) {
-		List<RatingList> notAcceptedApps = ratingListService.findNotAcceptedApps();
+	public String viewNotAcceptedApps(HttpSession session, @PageableDefault(size = 5, sort = "application_id", direction = Sort.Direction.ASC) Pageable pageable) {
+		Page<RatingList> notAcceptedApps = ratingListService.findNotAcceptedApps(pageable);
 		
 		session.setAttribute("notAcceptedApps", notAcceptedApps);
 		

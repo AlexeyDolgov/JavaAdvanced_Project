@@ -75,6 +75,7 @@
 						</div>
 					</div>
 				</div>
+				<th:block th:replace="fragments/pager::commonPager(${session.notAcceptedApps}, '/main', ${ {3, 6, 9, 12, 24} })"/>
 			</div>
 			<div th:if="${session.notAcceptedApps.isEmpty()}">
 				<p class="lead">

@@ -35,6 +35,7 @@
 				</tr>
 			</tbody>
 		</table>
+		<th:block th:replace="fragments/pager::commonPager(${session.notAcceptedApps}, '/application/notAcceptedApps', ${ {3, 5, 10, 20, 50} })"/>
 	</main>
 </th:block>
 
