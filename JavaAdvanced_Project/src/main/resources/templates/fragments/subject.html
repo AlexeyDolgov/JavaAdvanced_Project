@@ -9,6 +9,8 @@
 	</div>
 	<form th:object="${subject}" th:action="${path}" method="post">
 		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+		<input th:if="${!isEditForm}" type="hidden" name="refererURI" th:value="${refererURI}"/>
+		<input th:if="${!isEditForm}" type="hidden" name="superRefererURI" th:value="${superRefererURI}"/>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">[[#{subject.title}]]: </label>
 			<div class="col-sm-6">

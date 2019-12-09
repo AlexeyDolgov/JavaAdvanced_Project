@@ -1,8 +1,11 @@
 package ua.lviv.lgs.admissionsOffice.controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +37,26 @@ public class SubjectController {
 	}
 	
 	@GetMapping("/create")
-	public String viewCreationForm() {
+	public String viewCreationForm(@RequestParam(name = "superRefererURI", required = false) String superRefererURI, HttpServletRequest request, Model model) throws URISyntaxException {
+		model.addAttribute("refererURI", new URI(request.getHeader("referer")).getPath());
+		
+		if (superRefererURI != null) {
+			model.addAttribute("superRefererURI", superRefererURI);
+		}
+		
 		return "subjectCreator";
 	}
 
 	@PostMapping("/create")
-	public String createSubject(@Valid Subject subject,	BindingResult bindingResult, Model model) {
+	public String createSubject(String refererURI, String superRefererURI, @Valid Subject subject, BindingResult bindingResult, Model model) {
 		if (bindingResult.hasErrors()) {
             Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
             model.mergeAttributes(errors);
+            model.addAttribute("refererURI", refererURI);
+            
+            if (superRefererURI != "") {
+    			model.addAttribute("superRefererURI", superRefererURI);
+    		}
             
             return "subjectCreator";
         }
@@ -51,10 +65,20 @@ public class SubjectController {
 		
 		if (subjectExists) {
 			model.addAttribute("subjectExistsMessage", "Такой предмет уже существует!");
+			model.addAttribute("refererURI", refererURI);
+			
+			if (superRefererURI != "") {
+				model.addAttribute("superRefererURI", superRefererURI);
+			}
+			
 			return "subjectCreator";
 		}
 		
-		return "redirect:/subject/";
+		if (superRefererURI != "") {
+			return "redirect:" + refererURI + "?superRefererURI=" + superRefererURI;
+		}
+		
+		return "redirect:" + refererURI;
 	}
 	
 	@GetMapping("/edit")
