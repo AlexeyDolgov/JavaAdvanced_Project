@@ -20,6 +20,13 @@ create table faculty (
 	primary key (faculty_id)
 ) engine=MyISAM;
 
+create table subject_coeffs (
+	faculty_faculty_id integer not null,
+	subject_coeffs_key integer not null,
+	subject_coeffs double not null,
+	primary key (faculty_faculty_id, subject_coeffs_key)
+) engine=MyISAM;
+
 create table speciality (
 	speciality_id integer not null auto_increment,
 	title varchar(255) not null,
@@ -99,6 +106,14 @@ alter table subject_faculty
 alter table subject_faculty
 	add constraint subject_faculty__faculty__fk
 	foreign key (faculty_id) references faculty (faculty_id);
+
+alter table subject_coeffs
+	add constraint subject_coeffs__faculty__fk
+	foreign key (faculty_faculty_id) references faculty (faculty_id);
+
+alter table subject_coeffs
+	add constraint subject_coeffs__subject__fk
+	foreign key (subject_coeffs_key) references subject (subject_id);
 
 alter table applicant
 	add constraint applicant__user__fk

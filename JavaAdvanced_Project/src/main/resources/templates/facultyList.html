@@ -22,7 +22,8 @@
 					<th th:text="${faculty.id}"/>
 					<td th:text="${faculty.title}"/>
 					<td><div th:each="speciality, iterStat: ${faculty.specialities}" th:text="${!iterStat.last} ? ${speciality.title} + ', ' : ${speciality.title}"></div></td>
-					<td><div th:each="examSubject, iterStat: ${faculty.examSubjects}" th:text="${!iterStat.last} ? ${examSubject.title} + ', ' : ${examSubject.title}"></div></td>
+					<td><div th:each="examSubject, iterStat: ${faculty.examSubjects}"
+						th:text="${!iterStat.last} ? |${examSubject.title} (${faculty.subjectCoeffs[__${examSubject.id}__]})| + ', ' : |${examSubject.title} (${faculty.subjectCoeffs[__${examSubject.id}__]})|"></div></td>
 					<td>
 						<a th:href="@{'/faculty/edit?id=' + ${faculty.id}}">[[#{faculty.edit}]]</a>
 						<span th:if="${faculty.examSubjects.isEmpty() AND faculty.specialities.isEmpty()}">  |  

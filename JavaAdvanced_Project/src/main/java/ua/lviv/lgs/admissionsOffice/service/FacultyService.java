@@ -1,5 +1,6 @@
 package ua.lviv.lgs.admissionsOffice.service;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,10 @@ public class FacultyService {
 		Set<Subject> examSubjects = parseExamSubjects(form);
 		faculty.setExamSubjects(examSubjects);
 
+		Map<Subject, Double> subjectCoeffs = parseSubjectCoeffs(form);
+		faculty.setSubjectCoeffs(subjectCoeffs);
+
+
 		logger.trace("Saving updated faculty in database...");
 		facultyRepository.save(faculty);
 	}
@@ -76,5 +81,23 @@ public class FacultyService {
 			}
 		}
 		return examSubjects;
+	}
+	
+	public Map<Subject, Double> parseSubjectCoeffs(Map<String, String> form) {
+		logger.trace("Parsing subjects coefficients from Form Strings and mapping to Java Collection of objects...");
+		
+		Set<String> subjectTitles = subjectRepository.findAll().stream().map(Subject::getTitle).collect(Collectors.toSet());
+		Map<Subject, Double> subjectCoeffs = new HashMap<>();
+
+		for (String key : form.keySet()) {
+			if (subjectTitles.contains(form.get(key))) {
+				for (String key2 : form.keySet()) {
+					if (key2.equals("coeff" + key)) {
+						subjectCoeffs.put(new Subject(Integer.valueOf(key), form.get(key)), Double.valueOf(form.get(key2)));
+					}
+				}
+			}
+		}
+		return subjectCoeffs;
 	}
 }

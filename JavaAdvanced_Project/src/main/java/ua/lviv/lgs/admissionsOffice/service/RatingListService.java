@@ -57,7 +57,7 @@ public class RatingListService {
 		
 		ratingList.setId(application.getId());
 		
-		Double totalMark = calculateTotalMark(application.getZnoMarks(), application.getAttMark());
+		Double totalMark = calculateTotalMark(application.getSpeciality().getFaculty().getSubjectCoeffs(), application.getZnoMarks(), application.getAttMark());
 		ratingList.setTotalMark(totalMark);
 				
 		checkApplicationForRejectionMessage(application, form, ratingList);
@@ -125,20 +125,19 @@ public class RatingListService {
 		mailSender.send(application.getApplicant().getUser().getEmail(), "Вступительная заявка на специальность \"" + application.getSpeciality().getTitle() + "\" отклонена", message);        
 	}
 
-	public Double calculateTotalMark(Map<Subject, Integer> znoMarks, Integer attMark) {
+	public Double calculateTotalMark(Map<Subject, Double> subjectCoeffs, Map<Subject, Integer> znoMarks, Integer attMark) {
 		logger.trace("Calculating application total mark...");
 		
-		Integer i = 1;
-		Double totalMark = Double.valueOf(attMark);
+		Double totalZnoMark = 0.0;
 		
-		for (Integer znoMark : znoMarks.values()) {
-			i += 1;
-			totalMark += znoMark;
+		for (Entry<Subject, Integer> entry : znoMarks.entrySet()) {
+			Double subjectCoeff = subjectCoeffs.get(entry.getKey());
+			Integer znoSubjectMark = entry.getValue();
+			Double znoMark = subjectCoeff * Double.valueOf(znoSubjectMark);
+			
+			totalZnoMark += znoMark;
 		}
-		
-		totalMark = totalMark/i;
-		
-		return totalMark;
+		return RatingList.znoCoeff * totalZnoMark + RatingList.attMarkCoeff * Double.valueOf(attMark);
 	}
 
 	public Map<Speciality, Integer> parseNumberOfApplicationsBySpeciality() {

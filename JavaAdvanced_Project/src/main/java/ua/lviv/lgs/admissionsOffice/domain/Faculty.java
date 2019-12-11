@@ -1,10 +1,13 @@
 package ua.lviv.lgs.admissionsOffice.domain;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -13,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
@@ -33,6 +37,11 @@ public class Faculty implements Serializable {
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "subject_faculty", joinColumns = @JoinColumn(name = "faculty_id"), inverseJoinColumns = @JoinColumn(name = "subject_id"))
 	private Set<Subject> examSubjects;
+	
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name = "subject_coeffs")
+	@MapKeyColumn(name = "subject_id")
+	private Map<Subject, Double> subjectCoeffs;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "faculty")
 	@Column(nullable = false)
@@ -68,6 +77,14 @@ public class Faculty implements Serializable {
 
 	public void setExamSubjects(Set<Subject> examSubjects) {
 		this.examSubjects = examSubjects;
+	}
+
+	public Map<Subject, Double> getSubjectCoeffs() {
+		return subjectCoeffs;
+	}
+
+	public void setSubjectCoeffs(Map<Subject, Double> subjectCoeffs) {
+		this.subjectCoeffs = subjectCoeffs;
 	}
 
 	public Set<Speciality> getSpecialities() {

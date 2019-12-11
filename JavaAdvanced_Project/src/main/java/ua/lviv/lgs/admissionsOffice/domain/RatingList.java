@@ -14,6 +14,9 @@ import javax.persistence.Table;
 public class RatingList implements Serializable, Comparable<RatingList> {
 	private static final long serialVersionUID = 1L;
 
+	public static final double znoCoeff = 0.9;
+	public static final double attMarkCoeff = 0.1;
+
 	@Id
 	@Column
 	private Integer id;
