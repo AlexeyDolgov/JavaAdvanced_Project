@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import ua.lviv.lgs.admissionsOffice.dao.FacultyRepository;
 import ua.lviv.lgs.admissionsOffice.dao.SubjectRepository;
+import ua.lviv.lgs.admissionsOffice.domain.Application;
 import ua.lviv.lgs.admissionsOffice.domain.Faculty;
 import ua.lviv.lgs.admissionsOffice.domain.Subject;
 
@@ -26,6 +27,8 @@ public class FacultyService {
 	private FacultyRepository facultyRepository;
 	@Autowired
 	private SubjectRepository subjectRepository;
+	@Autowired
+	private ApplicationService applicationService;
 
 	public List<Faculty> findAll() {
 		logger.trace("Getting all faculties from database...");
@@ -99,5 +102,24 @@ public class FacultyService {
 			}
 		}
 		return subjectCoeffs;
+	}
+	
+	public Map<Faculty, Integer> countApplicationsByFaculty() {
+		logger.trace("Counting number of applications by Faculty...");
+		
+		List<Faculty> facultyList = findAll();
+		List<Application> applicationList = applicationService.findAll();
+		Map<Faculty, Integer> applicationsByFaculty = new HashMap<>();
+		
+		for (Faculty faculty : facultyList) {
+			Integer appCounter = 0;			
+			for (Application application : applicationList) {
+				if (application.getSpeciality().getFaculty().equals(faculty)) {
+					appCounter += 1;
+				}				
+			}
+			applicationsByFaculty.put(faculty, appCounter);			
+		}
+		return applicationsByFaculty;
 	}
 }

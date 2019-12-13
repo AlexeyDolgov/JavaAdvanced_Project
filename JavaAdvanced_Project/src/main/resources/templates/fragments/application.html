@@ -68,7 +68,9 @@
 		<div class="form-group row" sec:authorize="hasAuthority('ADMIN')">
 			<label class="col-sm-2 col-form-label"><b>[[#{aplication.total_mark}]]: </b></label>
 			<div class="col-sm-6">
-				<input class="form-control-plaintext" type="text" name="totalMark" th:value="${#numbers.formatDecimal(aplication.ratingList.totalMark, 3, 2)}" readonly/>
+				<a class="form-control-plaintext" th:href="@{'/ratingList/totalMarkCalculation?applicant_id=' + ${aplication.applicant.id} + '&speciality_id=' + ${aplication.speciality.id}}">
+					[[${#numbers.formatDecimal(aplication.ratingList.totalMark, 3, 2)}]]
+				</a>
 			</div>
 		</div>
 		<div class="form-group row">
@@ -94,7 +96,7 @@
 			<div class="form-group row">
 				<div class="col-sm-2 mt-2">
 					<label class="form-check-label">
-						<input class="form-check-input" type="checkbox" name="accept" id="accept" onclick="showRejectionMessage()" />
+						<input class="form-check-input" type="checkbox" name="accept" id="accept"/>
 						<b>[[#{aplication.accept}]]</b>
 					</label>
 				</div>
@@ -103,7 +105,7 @@
 				</div>
 			</div>
 		</div>
-		<button class="btn btn-primary my-3" type="submit">[[${isEditForm}?#{aplication.save}:#{aplication.create}]]</button>
+		<button class="btn btn-primary my-3" type="submit" id="submit">[[${isEditForm}?#{aplication.save}:#{aplication.create}]]</button>
 	</form>
 	<script src="../messageResource.js"></script>
 	<script>	
@@ -162,15 +164,67 @@
 		document.getElementById('filesList').innerHTML = '<ul>' + output.join('') + '</ul>';
 	}
 
-	document.getElementById('files').addEventListener('change',	handleFileSelect, false);	
-	
-	function showRejectionMessage() {
+	document.addEventListener('DOMContentLoaded', function() {
+		if (document.getElementById('files') != null) {
+			document.getElementById('files').addEventListener('change',	handleFileSelect, false);
+		}
+	});
+
+	document.addEventListener('DOMContentLoaded', function() {
 		var checkbox = document.getElementById('accept');
-		var rejectionMessage = document.getElementById('rejectionMessage');
 		
-		var state = (checkbox.checked) ? "none" : "block";
+		if (checkbox != null) {
+			checkbox.onclick = function() {
+				handleRejectionMessageVisibility(checkbox);
+				handleSubmitButtonStyleOnCheckboxChange(checkbox);
+			}
+		}
+	});
+
+	function handleRejectionMessageVisibility(checkbox) {
+		var rejectionMessage = document.getElementById('rejectionMessage');
+		var state = (checkbox.checked) ? 'none' : 'block';
+
 		rejectionMessage.style.display = state;
+		rejectionMessage.value = '';		
 	}
+	
+	function handleSubmitButtonStyleOnCheckboxChange(checkbox) {
+		var button = document.getElementById('submit');
+		
+		if (checkbox.checked) {
+			button.classList.remove('btn-primary');
+			button.classList.remove('btn-danger');
+			button.classList.add('btn-success');
+			button.innerHTML = messageResource.get('aplication.accept', 'message', currentLocale);
+		} else {
+			button.classList.remove('btn-success');
+			button.classList.remove('btn-danger');
+			button.classList.add('btn-primary');
+			button.innerHTML = messageResource.get('aplication.save', 'message', currentLocale);
+		}
+	}
+
+	document.addEventListener('DOMContentLoaded', function handleSubmitButtonStyleOnRejectionMessageChange() {
+		var rejectionMessage = document.getElementById('rejectionMessage');
+		var button = document.getElementById('submit');
+		
+		if (rejectionMessage != null) {
+			rejectionMessage.oninput = function() {
+				if (rejectionMessage.value != '') {
+					button.classList.remove('btn-primary');
+					button.classList.remove('btn-danger');
+					button.classList.add('btn-danger');
+					button.innerHTML = messageResource.get('aplication.reject', 'message', currentLocale);		
+				} else {
+					button.classList.remove('btn-success');
+					button.classList.remove('btn-danger');
+					button.classList.add('btn-primary');
+					button.innerHTML = messageResource.get('aplication.save', 'message', currentLocale);
+				}
+			}
+		}
+	});
 	</script>
 </main>
 

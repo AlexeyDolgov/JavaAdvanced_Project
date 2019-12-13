@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,25 +16,46 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import ua.lviv.lgs.admissionsOffice.domain.Applicant;
+import ua.lviv.lgs.admissionsOffice.domain.Application;
+import ua.lviv.lgs.admissionsOffice.domain.RatingList;
 import ua.lviv.lgs.admissionsOffice.domain.Speciality;
+import ua.lviv.lgs.admissionsOffice.service.ApplicationService;
 import ua.lviv.lgs.admissionsOffice.service.RatingListService;
 
 @Controller
 @RequestMapping("/ratingList")
 public class RatingListController {
 	@Autowired
+	private ApplicationService applicationService;
+	@Autowired
 	private RatingListService ratingListService;
 	
 	@GetMapping("/speciality")
-	public String viewApplicantsRankBySpeciality(@RequestParam("id") Speciality speciality, HttpServletRequest request, Model model) throws URISyntaxException {
+	public String viewApplicantsRankBySpeciality(@RequestParam("id") Speciality speciality, HttpServletRequest request, HttpSession session, Model model) throws URISyntaxException {
 		Map<Applicant, Double> applicantsRank = ratingListService.parseApplicantsRankBySpeciality(speciality.getId());
 		Set<Applicant> enrolledApplicants = ratingListService.getEnrolledApplicantsBySpeciality(speciality);
 
 		model.addAttribute("speciality", speciality);
 		model.addAttribute("applicantsRank", applicantsRank);
 		model.addAttribute("enrolledApplicants", enrolledApplicants);
-		model.addAttribute("refererURI", new URI(request.getHeader("referer")).getPath());
+		
+		if (!(new URI(request.getHeader("referer")).getPath()).equals("/ratingList/totalMarkCalculation")) {
+			session.setAttribute("refererURI", new URI(request.getHeader("referer")));
+		}
 
 		return "ratingList";
+	}
+	
+	@GetMapping("/totalMarkCalculation")
+	public String viewTotalMarkCalculation(@RequestParam("applicant_id") Applicant applicant, @RequestParam("speciality_id") Speciality speciality, HttpServletRequest request, Model model) throws URISyntaxException {
+		Application application = applicationService.findByApplicantAndSpeciality(applicant, speciality);
+		
+		model.addAttribute("aplication", application);
+		model.addAttribute("totalZnoMark", ratingListService.calculateTotalZnoMark(application.getSpeciality().getFaculty().getSubjectCoeffs(), application.getZnoMarks()));
+		model.addAttribute("znoCoeff", RatingList.znoCoeff);
+		model.addAttribute("attMarkCoeff", RatingList.attMarkCoeff);		
+		model.addAttribute("refererURI", new URI(request.getHeader("referer")));
+
+		return "totalMarkCalculation";
 	}
 }

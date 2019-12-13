@@ -128,6 +128,13 @@ public class RatingListService {
 	public Double calculateTotalMark(Map<Subject, Double> subjectCoeffs, Map<Subject, Integer> znoMarks, Integer attMark) {
 		logger.trace("Calculating application total mark...");
 		
+		Double totalZnoMark = calculateTotalZnoMark(subjectCoeffs, znoMarks);
+		return RatingList.znoCoeff * totalZnoMark + RatingList.attMarkCoeff * Double.valueOf(attMark);
+	}
+
+	public Double calculateTotalZnoMark(Map<Subject, Double> subjectCoeffs, Map<Subject, Integer> znoMarks) {
+		logger.trace("Calculating total ZNO mark...");
+		
 		Double totalZnoMark = 0.0;
 		
 		for (Entry<Subject, Integer> entry : znoMarks.entrySet()) {
@@ -137,7 +144,7 @@ public class RatingListService {
 			
 			totalZnoMark += znoMark;
 		}
-		return RatingList.znoCoeff * totalZnoMark + RatingList.attMarkCoeff * Double.valueOf(attMark);
+		return totalZnoMark;
 	}
 
 	public Map<Speciality, Integer> parseNumberOfApplicationsBySpeciality() {

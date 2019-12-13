@@ -19,6 +19,7 @@ import ua.lviv.lgs.admissionsOffice.dao.SubjectRepository;
 import ua.lviv.lgs.admissionsOffice.domain.Applicant;
 import ua.lviv.lgs.admissionsOffice.domain.Application;
 import ua.lviv.lgs.admissionsOffice.domain.RatingList;
+import ua.lviv.lgs.admissionsOffice.domain.Speciality;
 import ua.lviv.lgs.admissionsOffice.domain.Subject;
 import ua.lviv.lgs.admissionsOffice.domain.SupportingDocument;
 
@@ -35,10 +36,22 @@ public class ApplicationService {
 	@Autowired
 	private RatingListService ratingListService;
 	
+	public List<Application> findAll() {
+		logger.trace("Getting all applications from database...");
+		
+		return applicationRepository.findAll();
+	}
+	
 	public List<Application> findByApplicant(Applicant applicant) {
 		logger.trace("Getting all applications by specified applicant from database...");
 		
 		return applicationRepository.findByApplicant(applicant);
+	}
+	
+	public Application findByApplicantAndSpeciality(Applicant applicant, Speciality speciality) {
+		logger.trace("Getting application by specified applicant and speciality from database...");
+		
+		return applicationRepository.findByApplicantAndSpeciality(applicant, speciality).get();
 	}
 	
 	public boolean createApplication(Application application, Map<String, String> form, MultipartFile[] supportingDocuments) throws IOException {

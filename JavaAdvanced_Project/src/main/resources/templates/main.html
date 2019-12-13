@@ -69,7 +69,11 @@
 									</div>
 									<div>[[#{main.admin.grade_point_avg}]]: [[${app.application.attMark}]] [[#{main.admin.points}]]</div>
 								</p>
-								<p class="card-text"><b>[[#{main.admin.total_mark}]]: </b>[[${#numbers.formatDecimal(app.totalMark, 3, 2)}]] [[#{main.admin.points}]]</p>
+								<p class="card-text"><b>[[#{main.admin.total_mark}]]: </b>
+									<a th:href="@{'/ratingList/totalMarkCalculation?applicant_id=' + ${app.application.applicant.id} + '&speciality_id=' + ${app.application.speciality.id}}">
+										[[${#numbers.formatDecimal(app.totalMark, 3, 2)}]] [[#{main.admin.points}]]
+									</a>
+								</p>
 								<a th:href="@{'/application/edit?id=' + ${app.id}}" class="card-link">[[#{main.admin.app_open}]]</a>						
 							</div>
 						</div>

@@ -2,7 +2,6 @@ package ua.lviv.lgs.admissionsOffice.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,8 +32,8 @@ public class FacultyController {
 	
 	@GetMapping
 	public String viewFacultyList(Model model) {
-		List<Faculty> facultiesList = facultyService.findAll();
-		model.addAttribute("faculties", facultiesList);
+		model.addAttribute("faculties", facultyService.findAll());
+		model.addAttribute("aplicationsByFaculty", facultyService.countApplicationsByFaculty());
 
 		return "facultyList";
 	}
