@@ -46,6 +46,7 @@
 			</li>
 		</ul>
 		<div id="i18n">
+			<span th:text="${#locale.language}" id="currentLocale" style="display: none"></span>
 			<span th:text="#{navbar.lang.change}"></span>:
 			<select id="locales">    			
     			<option value="en" th:text="#{navbar.lang.en}"></option>
@@ -90,8 +91,8 @@
 	}
 	
 	document.addEventListener('DOMContentLoaded', function() {
-		var selectedItem = localStorage.getItem('locales');
-		$('#locales').val(selectedItem ? selectedItem : 'en');
+		var currentLocale = $('#currentLocale')[0].textContent;
+		$('#locales').val(currentLocale ? currentLocale : 'ru');
 		
 	    $("#locales").change(function () {
 	        var selectedOption = $('#locales').val();
