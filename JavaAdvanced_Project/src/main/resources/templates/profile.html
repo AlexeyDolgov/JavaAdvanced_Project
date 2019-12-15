@@ -6,9 +6,9 @@
 <th:block th:replace="fragments/common::commonPage(_, ~{::main})">
     <main>
         <h3>[[${title}]]</h3>
-        <div th:if="${message}" class="alert alert-danger" role="alert">
-            [[${message}]]
-        </div>
+		<div th:if="${userExistsMessage}" class="alert alert-danger" role="alert">
+			[[#{userExistsMessage}]]
+		</div>
 
         <form method="post" enctype="multipart/form-data">
             <div class="row">

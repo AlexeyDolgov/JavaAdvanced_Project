@@ -91,8 +91,16 @@ public class SpecialityController {
 			return "specialityEditor";
 		}
 
-		specialityService.updateSpeciality(updatedSpeciality, form);
-
+		boolean specialityExists = !specialityService.updateSpeciality(updatedSpeciality, form);
+		
+		if (specialityExists) {
+			model.addAttribute("specialityExistsMessage", "Такая специальность уже существует!");
+			model.addAttribute("speciality", speciality);
+			model.addAttribute("faculties", facultyService.findAll());
+			
+			return "specialityEditor";
+		}
+		
 		return "redirect:/speciality";
 	}
 	

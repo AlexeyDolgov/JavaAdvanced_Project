@@ -90,36 +90,7 @@ public class UserController {
 			@RequestParam(required = false) MultipartFile photo,
 			@RequestParam(required = false) String removePhotoFlag,
 			Model model) throws IOException {
-		Map<String, String> errors = new HashMap<>();
-		if (StringUtils.isEmpty(firstName)) {
-			errors.put("firstNameError", "Имя пользователя не может быть пустым!");			
-		}
-		
-		if (StringUtils.isEmpty(lastName)) {
-			errors.put("lastNameError", "Фамилия пользователя не может быть пустым!");
-		}
-		
-		if (StringUtils.isEmpty(email)) {
-			errors.put("emailError", "Email пользователя не может быть пустым!");
-		}
-		
-		if (password.length() < 6) {
-			errors.put("passwordError", "Пароль пользователя должен быть не менее 6 символов!");
-		}
-		
-		if (confirmPassword.length() < 6) {
-			errors.put("confirmPasswordError", "Пароль пользователя должен быть не менее 6 символов!");
-		}
-			
-		if (password != "" && confirmPassword != "" && !password.equals(confirmPassword)) {
-			errors.put("confirmPasswordError", "Введённые пароли не совпадают!");
-        }
-		
-		if (user.getAccessLevels().contains(AccessLevel.valueOf("USER"))) {
-			if (!photo.isEmpty() && !photo.getContentType().contains("image")) {
-				errors.put("photoError", "Файл фотографии должен быть графическим изображением!");
-			}
-		}
+		Map<String, String> errors = userService.getProfileErrors(user, firstName, lastName, email, password, confirmPassword, photo);
 				
 		if (!errors.isEmpty()) {
 			model.mergeAttributes(errors);
@@ -133,7 +104,14 @@ public class UserController {
 			return "profile";			
 		}
 		
-		userService.updateProfile(user, firstName, lastName, email, password, birthDate, city, school, photo, removePhotoFlag);
+		boolean userExists = !userService.updateProfile(user, firstName, lastName, email, password, birthDate, city, school, photo, removePhotoFlag);
+		
+		if (userExists) {
+			model.addAttribute("userExistsMessage", "Такой пользователь уже существует!");
+			model.addAttribute("user", userService.findById(user.getId()));
+
+			return "profile";
+		}
 		
 		return "redirect:/main";
 	}

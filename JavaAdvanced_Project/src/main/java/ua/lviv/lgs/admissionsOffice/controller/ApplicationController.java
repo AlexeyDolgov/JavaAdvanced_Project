@@ -124,8 +124,17 @@ public class ApplicationController {
 			return "applicationEditor";
 		}
 		
-		applicationService.updateApplication(updatedApplication, form, supportingDocuments);
+		boolean applicationExists = !applicationService.updateApplication(updatedApplication, form, supportingDocuments);
+		
+		if (applicationExists) {
+			model.addAttribute("applicationExistsMessage", "На выбранную специальность заявка уже существует!");
+			model.addAttribute("aplication", application);
+			model.addAttribute("specialities", specialityService.findByRecruitmentCompletedFalse());
+			model.addAttribute("downloadURI", ServletUriComponentsBuilder.fromCurrentContextPath().path("/downloadFile/").toUriString());
 
+			return "applicationEditor";
+		}
+		
 		if (((User) session.getAttribute("user")).getAccessLevels().contains(AccessLevel.valueOf("ADMIN"))) {
 			return "redirect:/application/notAcceptedApps";
 		}

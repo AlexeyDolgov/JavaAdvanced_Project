@@ -54,17 +54,25 @@ public class ApplicationService {
 		return applicationRepository.findByApplicantAndSpeciality(applicant, speciality).get();
 	}
 	
-	public boolean createApplication(Application application, Map<String, String> form, MultipartFile[] supportingDocuments) throws IOException {
-		logger.trace("Adding new application to database...");
+	public boolean checkIfExists(Application application) {
+    	logger.trace("Checking if stored application already exists in database...");
 		
 		Optional<Application> applicationFromDb = applicationRepository.findByApplicantAndSpeciality(application.getApplicant(), application.getSpeciality());
 		
-		if (applicationFromDb.isPresent()) {
+		if (applicationFromDb.isPresent() && application.getId() != applicationFromDb.get().getId()) {
 			logger.warn("Application with applicant " + applicationFromDb.get().getApplicant().getUser().getFirstName()
 					+ " " + applicationFromDb.get().getApplicant().getUser().getLastName() + " and speciality \""
 					+ applicationFromDb.get().getSpeciality().getTitle() + "\" already exists in database...");
-			return false;
+			return true;
 		}
+		return false;
+	}
+	
+	public boolean createApplication(Application application, Map<String, String> form, MultipartFile[] supportingDocuments) throws IOException {
+		logger.trace("Adding new application to database...");
+		
+		if (checkIfExists(application)) 
+			return false;
 
 		Map<Subject, Integer> znoMarks = parseZnoMarks(form);
 		application.setZnoMarks(znoMarks);
@@ -83,9 +91,12 @@ public class ApplicationService {
 		return true;
 	}
 
-	public void updateApplication(Application application, Map<String, String> form, MultipartFile[] supportingDocuments) throws IOException {
+	public boolean updateApplication(Application application, Map<String, String> form, MultipartFile[] supportingDocuments) throws IOException {
 		logger.trace("Updating application in database...");
-		
+
+		if (checkIfExists(application)) 
+			return false;
+
 		Map<Subject, Integer> znoMarks = parseZnoMarks(form);
 		application.setZnoMarks(znoMarks);
 		
@@ -99,6 +110,7 @@ public class ApplicationService {
 		
 		logger.trace("Saving updated application in database...");
 		applicationRepository.save(application);
+		return true;
 	}
 	
 	public Map<String, String> getZnoMarksErrors(Map<String, String> form) {

@@ -36,15 +36,23 @@ public class FacultyService {
 		return facultyRepository.findAll();
 	}
 
+	public boolean checkIfExists(Faculty faculty) {
+    	logger.trace("Checking if stored faculty already exists in database...");
+    	
+		Optional<Faculty> facultyFromDb = facultyRepository.findByTitle(faculty.getTitle());
+		
+		if (facultyFromDb.isPresent() && faculty.getId() != facultyFromDb.get().getId()) {
+			logger.warn("Faculty with title \"" + facultyFromDb.get().getTitle() + "\" already exists in database...");
+			return true;
+		}
+		return false;
+	}
+	
 	public boolean createFaculty(Faculty faculty, Map<String, String> form) {
 		logger.trace("Adding new faculty to database...");
 		
-		Optional<Faculty> facultyFromDb = facultyRepository.findByTitle(faculty.getTitle());
-		
-		if (facultyFromDb.isPresent()) {
-			logger.warn("Faculty with title \"" + facultyFromDb.get().getTitle() + "\" already exists in database...");
+		if (checkIfExists(faculty)) 
 			return false;
-		}
 		
 		logger.trace("Saving new faculty in database...");
 		facultyRepository.save(faculty);
@@ -52,18 +60,21 @@ public class FacultyService {
 		return true;
 	}
 
-	public void updateFaculty(Faculty faculty, Map<String, String> form) {
+	public boolean updateFaculty(Faculty faculty, Map<String, String> form) {
 		logger.trace("Updating faculty in database...");
-		
+
+		if (checkIfExists(faculty)) 
+			return false;
+
 		Set<Subject> examSubjects = parseExamSubjects(form);
 		faculty.setExamSubjects(examSubjects);
 
 		Map<Subject, Double> subjectCoeffs = parseSubjectCoeffs(form);
 		faculty.setSubjectCoeffs(subjectCoeffs);
 
-
 		logger.trace("Saving updated faculty in database...");
 		facultyRepository.save(faculty);
+		return true;
 	}
 
 	public void deleteFaculty(Faculty faculty) {

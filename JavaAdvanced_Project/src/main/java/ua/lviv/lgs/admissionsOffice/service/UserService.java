@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,15 +63,23 @@ public class UserService implements UserDetailsService {
     	return userRepository.findAll();
     }
 
+    public boolean checkIfExists(User user) {
+    	logger.trace("Checking if stored user already exists in database...");
+    	
+    	User userFromDb = userRepository.findByEmail(user.getEmail());
+    	
+    	if (userFromDb != null && user.getId() != userFromDb.getId()) {
+    		logger.warn("User with email \"" + userFromDb.getEmail() + "\" already exists in database...");
+    		return true;
+    	}
+    	return false;
+    }
+    
     public boolean addUser(User user) {
     	logger.trace("Adding new user to database...");
     	
-        User userFromDb = userRepository.findByEmail(user.getEmail());
-
-        if (userFromDb != null) {
-        	logger.warn("User with email \"" + userFromDb.getEmail() + "\" already exists in database...");
-            return false;
-        }
+    	if (checkIfExists(user)) 
+			return false;
 
         logger.trace("Encoding recieved user's password...");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -151,7 +160,42 @@ public class UserService implements UserDetailsService {
 		userRepository.save(user);
 	}
     
-	public void updateProfile(User user, String firstName, String lastName, String email, String password,
+    public Map<String, String> getProfileErrors(User user, String firstName, String lastName, String email,
+    		String password, String confirmPassword, MultipartFile photo) {
+    	Map<String, String> errors = new HashMap<>();
+    	if (StringUtils.isEmpty(firstName)) {
+    		errors.put("firstNameError", "Имя пользователя не может быть пустым!");			
+    	}
+    	
+    	if (StringUtils.isEmpty(lastName)) {
+    		errors.put("lastNameError", "Фамилия пользователя не может быть пустым!");
+    	}
+    	
+    	if (StringUtils.isEmpty(email)) {
+    		errors.put("emailError", "Email пользователя не может быть пустым!");
+    	}
+    	
+    	if (password.length() < 6) {
+    		errors.put("passwordError", "Пароль пользователя должен быть не менее 6 символов!");
+    	}
+    	
+    	if (confirmPassword.length() < 6) {
+    		errors.put("confirmPasswordError", "Пароль пользователя должен быть не менее 6 символов!");
+    	}
+    	
+    	if (password != "" && confirmPassword != "" && !password.equals(confirmPassword)) {
+    		errors.put("confirmPasswordError", "Введённые пароли не совпадают!");
+    	}
+    	
+    	if (user.getAccessLevels().contains(AccessLevel.valueOf("USER"))) {
+    		if (!photo.isEmpty() && !photo.getContentType().contains("image")) {
+    			errors.put("photoError", "Файл фотографии должен быть графическим изображением!");
+    		}
+    	}
+    	return errors;
+    }
+    
+	public boolean updateProfile(User user, String firstName, String lastName, String email, String password,
 			String birthDate, String city, String school, MultipartFile photo, String removePhotoFlag) throws IOException {
 		logger.trace("Updating user's profile...");
 		
@@ -165,6 +209,9 @@ public class UserService implements UserDetailsService {
 				|| (userEmail != null && !userEmail.equals(email));
 
 		if (isEmailChanged) {
+			if (checkIfExists(user))
+				return false;
+			
 			user.setEmail(email);
 			user.setActive(false);
 			user.setActivationCode(UUID.randomUUID().toString());
@@ -203,6 +250,7 @@ public class UserService implements UserDetailsService {
 		
 		logger.trace("Saving updated user's profile in database...");
 		userRepository.save(user);
+		return true;
 	}
 	
 	public String parseFileData(User user) throws UnsupportedEncodingException {
@@ -218,4 +266,5 @@ public class UserService implements UserDetailsService {
 		
 		return fileBase64Encoded;
 	}
+
 }
