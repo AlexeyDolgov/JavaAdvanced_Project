@@ -65,9 +65,7 @@ public class UserServiceTests {
 
 		Mockito.doReturn(new User()).when(userRepository).findByEmail("some@mail.com");
 
-		boolean isUserCreated = userService.addUser(user);
-
-		Assert.assertFalse(isUserCreated);
+		Assert.assertFalse(userService.checkIfExists(user));
 
 		Mockito.verify(userRepository, Mockito.times(0)).save(ArgumentMatchers.any(User.class));
 		Mockito.verify(mailSender, Mockito.times(0))

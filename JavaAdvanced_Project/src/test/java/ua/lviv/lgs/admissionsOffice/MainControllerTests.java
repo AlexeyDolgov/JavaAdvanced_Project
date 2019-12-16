@@ -77,6 +77,6 @@ public class MainControllerTests {
 		this.mockMvc.perform(get("/main"))
 			.andDo(print())
 			.andExpect(authenticated())
-			.andExpect(content().string(containsString("Some previously submitted applications were rejected")));			
+			.andExpect(content().string(containsString("Некоторые поданные ранее заявки были отклонены")));			
 	}
 }
