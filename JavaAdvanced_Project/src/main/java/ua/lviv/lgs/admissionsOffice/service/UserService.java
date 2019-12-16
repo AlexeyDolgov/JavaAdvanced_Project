@@ -133,6 +133,18 @@ public class UserService implements UserDetailsService {
         return true;
     }
 
+    public Map<String, String> getUserErrors(Map<String, String> form) {
+    	Map<String, String> errors = new HashMap<>();
+    	if (StringUtils.isEmpty(form.get("firstName"))) {
+    		errors.put("firstNameError", "Имя пользователя не может быть пустым!");			
+    	}
+    	
+    	if (StringUtils.isEmpty(form.get("lastName"))) {
+    		errors.put("lastNameError", "Фамилия пользователя не может быть пустым!");
+    	}
+    	return errors;
+    }
+
     public void saveUser(User user, Map<String, String> form) {
     	logger.trace("Updating user's account...");
     	
@@ -266,5 +278,4 @@ public class UserService implements UserDetailsService {
 		
 		return fileBase64Encoded;
 	}
-
 }

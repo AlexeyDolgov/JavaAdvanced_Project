@@ -15,7 +15,9 @@
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">[[#{faculty.title}]]: </label>
 			<div class="col-sm-6">
-				<input class="form-control" type="text" name="title" th:value="${faculty}?*{title}" th:placeholder="#{faculty.title}"/>
+				<input th:class="${titleError}?'form-control is-invalid':'form-control'"
+					type="text" name="title" th:value="${faculty}?*{title}" th:placeholder="#{faculty.title}"/>
+				<div th:if="${titleError}" class="invalid-feedback" th:text="#{facultyTitleError}"></div>
 				<div id="titleError"></div>
 			</div>
 		</div>
@@ -36,93 +38,11 @@
 			</div>
 				<label class="form-check-label"><a th:href="@{/subject/create?superRefererURI=__${refererURI}__}">[[#{subject.new}]]...</a></label>
 		</div>			
-		<button class="btn btn-primary mt-3" type="submit">[[${isEditForm}?#{faculty.save}:#{faculty.create}]]</button>
+		<button class="btn btn-primary mt-3" type="submit" id="submit">[[${isEditForm}?#{faculty.save}:#{faculty.create}]]</button>
 	</form>
-	<script src="../messageResource.js"></script>
-	<script>
-	messageResource.init({ filePath: '../' });
-	var currentLocale = localStorage.getItem('locales');
-	messageResource.load('message', function() {}, currentLocale);
-	
-	document.addEventListener('DOMContentLoaded', function() {
-		var checkbox = $("input[type='checkbox']");
-		
-		for (var i = 0; i < checkbox.length; i++) {
-			if (!checkbox[i].checked) {
-				$("input[name='coeff" + checkbox[i].name + "']")[0].style.display = 'none';
-			}
-		}
-	});
-	
-	document.addEventListener('DOMContentLoaded', function() {
-		$("input[type='checkbox']").click(function() {
-			var state = ($(this)[0].checked) ? 'block' : 'none';
-			var field = 'coeff' + $(this).attr('name');
-			
-			$("input[name='" + field + "']")[0].style.display = state;
-			$("input[name='" + field + "']").val('');
-			$("div[id='" + field + "Error']").html('');
-			$("div[id='" + field + "Error']").removeClass('invalid-feedback');
-			$("input[name='" + field + "']").removeClass('is-invalid');
-		});
-	});
-	
-	document.addEventListener('DOMContentLoaded', function() {
-		$("button[type='submit']").click(function() {
-			var checkbox = $("input[type='checkbox']");
-			var errors = 0;
-			
-			errors += validateOnEmptiness('title', 'facultyTitleError');
-			
-			for (var i = 0; i < checkbox.length; i++) {
-				if (checkbox[i].checked) {
-					errors += validateOnEmptiness('coeff' + checkbox[i].name, 'facultyCoefficientError');
-				}
-			}
-			
-			var checkedSubjects = 0;
-			var totalCoeff = 0;
-			if (errors == 0) {
-				for (var i = 0; i < checkbox.length; i++) {
-					if (checkbox[i].checked) {
-						checkedSubjects += 1;
-						totalCoeff += parseFloat($("input[name='coeff" + checkbox[i].name + "']").val());
-					}
-				}				
-			}
-			
-			if (errors != 0) {
-				$('#facultyTotalCoeffMessage').html('');
-				$('#facultyTotalCoeffMessage').removeClass('alert alert-danger');
-				return false;
-			} else if (checkedSubjects > 0 && totalCoeff != 1) {
- 				$('#facultyTotalCoeffMessage').addClass('alert alert-danger');
-				$('#facultyTotalCoeffMessage').html(messageResource.get('facultyTotalCoeffMessage', 'message', currentLocale));
-				return false;
-			} else {
-				$('#facultyTotalCoeffMessage').html('');
-				$('#facultyTotalCoeffMessage').removeClass('alert alert-danger');
-				$('form').submit();
-			}
-		});
-	});
-	
-	function validateOnEmptiness(field, errorMessage) {
-		var errors = 0;
-		
-		if ($("input[name='" + field + "']").val() == '') {
-			$("input[name='" + field + "']").addClass('is-invalid');
-			$("div[id='" + field + "Error']").addClass('invalid-feedback');
-			$("div[id='" + field + "Error']").html(messageResource.get(errorMessage, 'message', currentLocale));
-			errors += 1;
-		} else {
-			$("div[id='" + field + "Error']").html('');				
-			$("div[id='" + field + "Error']").removeClass('invalid-feedback');
-			$("input[name='" + field + "']").removeClass('is-invalid');
-		}
-		return errors;
-	}
-	</script>
+	<script src="../js/messageResource.js"></script>
+	<script src="../js/commonUtils.js"></script>
+	<script src="../js/faculty.js"></script>
 </main>
 
 </html>

@@ -1,7 +1,6 @@
 package ua.lviv.lgs.admissionsOffice.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +8,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,14 +45,7 @@ public class UserController {
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping
 	public String userSave(@RequestParam Map<String, String> form, @RequestParam("userId") User user, Model model) {
-		Map<String, String> errors = new HashMap<>();
-		if (StringUtils.isEmpty(form.get("firstName"))) {
-			errors.put("firstNameError", "Имя пользователя не может быть пустым!");			
-		}
-		
-		if (StringUtils.isEmpty(form.get("lastName"))) {
-			errors.put("lastNameError", "Фамилия пользователя не может быть пустым!");
-		}
+		Map<String, String> errors = userService.getUserErrors(form);
 		
 		if (!errors.isEmpty()) {
 			model.mergeAttributes(errors);
@@ -68,7 +59,7 @@ public class UserController {
 
 		return "redirect:/user";
 	}
-	
+
 	@GetMapping("profile")
 	public String getProfile(@AuthenticationPrincipal User user, Model model) {
 		model.addAttribute("user", userService.findById(user.getId()));

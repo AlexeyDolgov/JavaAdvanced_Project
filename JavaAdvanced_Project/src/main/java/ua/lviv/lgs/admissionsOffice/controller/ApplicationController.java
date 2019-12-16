@@ -67,7 +67,7 @@ public class ApplicationController {
 	
 	@PreAuthorize("hasAuthority('USER')")
 	@PostMapping("/create")
-	public String createApplication(@RequestParam Map<String, String> form,	@RequestParam("files") MultipartFile[] supportingDocuments,
+	public String createApplication(@RequestParam Map<String, String> form,	@RequestParam("supportingDocument") MultipartFile[] supportingDocuments,
 			@Valid Application application, BindingResult bindingResult, Model model) throws IOException {
 		Map<String, String> znoMarksErrors = applicationService.getZnoMarksErrors(form);
 		Map<String, String> supportingDocumentErrors = supportingDocumentService.getSupportingDocumentErrors(supportingDocuments);
@@ -107,7 +107,7 @@ public class ApplicationController {
 
 	@PostMapping("/edit")
 	public String updateApplication(@RequestParam("id") Application application, @RequestParam Map<String, String> form,
-			@RequestParam("files") MultipartFile[] supportingDocuments, HttpSession session, @Valid Application updatedApplication,
+			@RequestParam("supportingDocument") MultipartFile[] supportingDocuments, HttpSession session, @Valid Application updatedApplication,
 			BindingResult bindingResult, Model model) throws IOException {
 		Map<String, String> znoMarksErrors = applicationService.getZnoMarksErrors(form);
 		Map<String, String> supportingDocumentErrors = supportingDocumentService.getSupportingDocumentErrors(supportingDocuments);
