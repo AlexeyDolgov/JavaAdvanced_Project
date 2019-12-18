@@ -97,7 +97,14 @@ public class ApplicationController {
 	}
 	
 	@GetMapping("/edit")
-	public String viewEditForm(@RequestParam("id") Application application, Model model) {
+	public String viewEditForm(@RequestParam("id") Application application, HttpSession session, Model model) {
+		User currentUser = ((User) session.getAttribute("user"));
+		if (currentUser.getAccessLevels().contains(AccessLevel.valueOf("USER"))
+				&& !application.getApplicant().getId().equals(currentUser.getId())
+				|| application.getRatingList().isAccepted()) {
+			return "redirect:/403";
+		}
+		
 		model.addAttribute("aplication", application);
 		model.addAttribute("specialities", specialityService.findByRecruitmentCompletedFalse());
 		model.addAttribute("downloadURI", ServletUriComponentsBuilder.fromCurrentContextPath().path("/downloadFile/").toUriString());
@@ -144,7 +151,14 @@ public class ApplicationController {
 	
 	@PreAuthorize("hasAuthority('USER')")
 	@GetMapping("/delete")
-	public String deleteApplication(@RequestParam("id") Application application) {
+	public String deleteApplication(@RequestParam("id") Application application, HttpSession session) {
+		User currentUser = ((User) session.getAttribute("user"));
+		if (currentUser.getAccessLevels().contains(AccessLevel.valueOf("USER"))
+				&& !application.getApplicant().getId().equals(currentUser.getId())
+				|| application.getSpeciality().isRecruitmentCompleted()) {
+			return "redirect:/403";
+		}
+		
 		applicationService.deleteApplication(application);
 
 		return "redirect:/application";

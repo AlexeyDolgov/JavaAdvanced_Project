@@ -92,6 +92,11 @@ public class FacultyController {
 	
 	@GetMapping("/edit")
 	public String viewEditForm(@RequestParam("id") Faculty faculty, Model model) {
+		Map<Faculty, Integer> countApplicationsByFaculty = facultyService.countApplicationsByFaculty();
+		if (countApplicationsByFaculty.get(faculty) != 0) {
+			return "redirect:/403";	
+		}
+		
 		model.addAttribute("faculty", faculty);
 		model.addAttribute("subjects", subjectService.findAll());
 		
@@ -125,6 +130,10 @@ public class FacultyController {
 	
 	@GetMapping("/delete")
 	public String deleteFaculty(@RequestParam("id") Faculty faculty) {
+		if (!faculty.getExamSubjects().isEmpty() && !faculty.getSpecialities().isEmpty()) {
+			return "redirect:/403";	
+		}
+		
 		facultyService.deleteFaculty(faculty);
 
 		return "redirect:/faculty";

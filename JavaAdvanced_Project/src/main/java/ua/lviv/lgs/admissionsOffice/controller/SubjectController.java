@@ -113,6 +113,10 @@ public class SubjectController {
 	
 	@GetMapping("/delete")
 	public String deleteSubject(@RequestParam("id") Subject subject) {
+		if (!subject.getFaculties().isEmpty()) {
+			return "redirect:/403";
+		}
+		
 		subjectService.deleteSubject(subject);
 
 		return "redirect:/subject";

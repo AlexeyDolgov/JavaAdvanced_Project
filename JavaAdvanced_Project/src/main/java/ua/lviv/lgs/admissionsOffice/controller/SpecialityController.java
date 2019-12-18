@@ -73,6 +73,10 @@ public class SpecialityController {
 
 	@GetMapping("/edit")
 	public String viewEditForm(@RequestParam("id") Speciality speciality, Model model) {
+		if (speciality.isRecruitmentCompleted()) {
+			return "redirect:/403";
+		}
+		
 		model.addAttribute("speciality", speciality);
 		model.addAttribute("faculties", facultyService.findAll());
 		
@@ -104,8 +108,12 @@ public class SpecialityController {
 		return "redirect:/speciality";
 	}
 	
-	@GetMapping("/delete")
+	@GetMapping("/delete")	
 	public String deleteSpeciality(@RequestParam("id") Speciality speciality) {
+		if (!speciality.getApplications().isEmpty()) {
+			return "redirect:/403";
+		}
+		
 		specialityService.deleteSpeciality(speciality);
 
 		return "redirect:/speciality";
@@ -113,6 +121,11 @@ public class SpecialityController {
 	
 	@GetMapping("/complete")
 	public String completeRecruitment(@RequestParam("id") Speciality speciality) {
+		Map<Speciality, Integer> submittedApps = ratingListService.parseNumberOfApplicationsBySpeciality();
+		if (submittedApps.get(speciality) == 0 || speciality.isRecruitmentCompleted()) {
+			return "redirect:/403";
+		}
+		
 		specialityService.completeRecruitment(speciality);
 
 		return "redirect:/speciality";

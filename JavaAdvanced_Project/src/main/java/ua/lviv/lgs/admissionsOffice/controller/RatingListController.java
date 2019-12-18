@@ -2,6 +2,7 @@ package ua.lviv.lgs.admissionsOffice.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,10 +16,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import ua.lviv.lgs.admissionsOffice.domain.AccessLevel;
 import ua.lviv.lgs.admissionsOffice.domain.Applicant;
 import ua.lviv.lgs.admissionsOffice.domain.Application;
 import ua.lviv.lgs.admissionsOffice.domain.RatingList;
 import ua.lviv.lgs.admissionsOffice.domain.Speciality;
+import ua.lviv.lgs.admissionsOffice.domain.User;
 import ua.lviv.lgs.admissionsOffice.service.ApplicationService;
 import ua.lviv.lgs.admissionsOffice.service.RatingListService;
 
@@ -32,6 +35,12 @@ public class RatingListController {
 	
 	@GetMapping("/speciality")
 	public String viewApplicantsRankBySpeciality(@RequestParam("id") Speciality speciality, HttpServletRequest request, HttpSession session, Model model) throws URISyntaxException {
+		User currentUser = ((User) session.getAttribute("user"));		
+		List<Speciality> specialities = ((List<Speciality>) session.getAttribute("specialities"));
+		if (currentUser.getAccessLevels().contains(AccessLevel.valueOf("USER")) && !specialities.contains(speciality)) {
+			return "redirect:/403";
+		}
+		
 		Map<Applicant, Double> applicantsRank = ratingListService.parseApplicantsRankBySpeciality(speciality.getId());
 		Set<Applicant> enrolledApplicants = ratingListService.getEnrolledApplicantsBySpeciality(speciality);
 
@@ -39,7 +48,9 @@ public class RatingListController {
 		model.addAttribute("applicantsRank", applicantsRank);
 		model.addAttribute("enrolledApplicants", enrolledApplicants);
 		
-		if (!(new URI(request.getHeader("referer")).getPath()).equals("/ratingList/totalMarkCalculation")) {
+		if (request.getHeader("referer") == null) {
+			session.setAttribute("refererURI", new URI("/"));
+		} else if (!(new URI(request.getHeader("referer")).getPath()).equals("/ratingList/totalMarkCalculation")) {
 			session.setAttribute("refererURI", new URI(request.getHeader("referer")));
 		}
 
